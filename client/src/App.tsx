@@ -1,24 +1,50 @@
-import { APITester } from "./APITester";
+import { useState } from "react";
+import { Api, type WeatherForecast } from "./api/Api";
 import "./index.css";
 
-import logo from "./logo.svg";
-import reactLogo from "./react.svg";
+const api = new Api({
+    baseUrl: "http://localhost:5188",
+});
 
 export function App() {
-  return (
-    <div className="app">
-      <div className="logo-container">
-        <img src={logo} alt="Bun Logo" className="logo bun-logo" />
-        <img src={reactLogo} alt="React Logo" className="logo react-logo" />
-      </div>
+    const [forecasts, setForecasts] = useState<WeatherForecast[]>([]);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-      <h1>Bun + React</h1>
-      <p>
-        Edit <code>src/App.tsx</code> and save to test HMR
-      </p>
-      <APITester />
-    </div>
-  );
+    async function testConnection() {
+        setLoading(true);
+        setError("");
+        setForecasts([]);
+
+        try {
+            const result = await api.weatherForecast.weatherForecastGet();
+            setForecasts(result);
+        } catch {
+            setError("Kunne ikke hente data fra backend.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <div className="app">
+            <h1>SatinRoad – forbindelsestest</h1>
+
+            <button onClick={testConnection} disabled={loading}>
+                {loading ? "Henter..." : "Test forbindelse"}
+            </button>
+
+            {error && <p role="alert">{error}</p>}
+
+            {forecasts.map((forecast, index) => (
+                <p key={forecast.date ?? index}>
+                    {forecast.date}: {forecast.temperatureC} °C
+                    {" – "}
+                    {forecast.summary}
+                </p>
+            ))}
+        </div>
+    );
 }
 
 export default App;
