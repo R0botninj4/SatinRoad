@@ -1,0 +1,21 @@
+﻿name: satinroad
+
+services:
+  api:
+    build: ./server
+    environment:
+      ConnectionStrings__DefaultConnection: "Data Source=/app/data/satinroad.db"
+    ports:
+      - "127.0.0.1:5188:8080"
+    volumes:
+      - sqlite-data:/app/data
+
+  web:
+    build: ./client
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  sqlite-data:
