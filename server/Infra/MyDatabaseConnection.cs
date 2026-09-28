@@ -8,4 +8,6 @@ public class MyDatabaseConnection
     : DataConnection(options.Options)
 {
     public ITable<Category> Categories => this.GetTable<Category>();
+
+    public ITable<Item> Items => this.GetTable<Item>();
 }
