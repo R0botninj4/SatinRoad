@@ -1,21 +1,6 @@
-﻿import "./MainPage.css";
-
-// Temporary fake data – will be replaced with data from the backend
-type Product = {
-    id: number;
-    name: string;
-    cheapestPrice: number;
-    amountListed: number;
-};
-
-const products: Product[] = [
-    { id: 1, name: "Blaze rod", cheapestPrice: 12.5, amountListed: 34 },
-    { id: 2, name: "Wheat", cheapestPrice: 45, amountListed: 8 },
-    { id: 3, name: "Sugar", cheapestPrice: 120, amountListed: 3 },
-    { id: 4, name: "Sugar cane", cheapestPrice: 10, amountListed: 50 },
-    { id: 5, name: "TNT", cheapestPrice: 25, amountListed: 6 },
-    { id: 6, name: "Seeds", cheapestPrice: 5, amountListed: 100 },
-];
+﻿import { Link } from "react-router-dom";
+import { getListingsForProduct, products } from "../TempData/Mockdata.ts";
+import "./MainPage.css";
 
 export function MainPage() {
     return (
@@ -25,17 +10,36 @@ export function MainPage() {
             </header>
 
             <div className="product-grid">
-                {products.map((product) => (
-                    <article key={product.id} className="product-card">
-                        <div className="product-image">Product image</div>
+                {products.map((product) => {
+                    const productListings = getListingsForProduct(product.id);
+                    const cheapest = productListings[0]?.pricePerItem;
+                    const amountListed = productListings.reduce(
+                        (sum, listing) => sum + listing.quantity,
+                        0,
+                    );
 
-                        <div className="product-info">
-                            <h2>{product.name}</h2>
-                            <p>From {product.cheapestPrice.toFixed(2)} kr</p>
-                            <p>{product.amountListed} listed</p>
-                        </div>
-                    </article>
-                ))}
+                    return (
+                        <article key={product.id} className="product-card">
+                            <Link to={`/products/${product.id}`} className="product-image">
+                                Product image
+                            </Link>
+
+                            <div className="product-info">
+                                <h2>
+                                    <Link to={`/products/${product.id}`} className="product-name">
+                                        {product.name}
+                                    </Link>
+                                </h2>
+                                <p>
+                                    {cheapest !== undefined
+                                        ? `From ${cheapest.toFixed(2)} kr`
+                                        : "No listings"}
+                                </p>
+                                <p>{amountListed} listed</p>
+                            </div>
+                        </article>
+                    );
+                })}
             </div>
         </section>
     );

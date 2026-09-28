@@ -184,4 +184,14 @@ code {
   ::after {
     animation: none !important;
   }
+
+  /* Relevant - Skal ikke slettes når bun design bliver fjernet */
+  /* Let pages use the full width (up to a max) */
+  #root {
+    width: 100%;
+    max-width: 1100px;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+  
 }

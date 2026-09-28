@@ -52,6 +52,20 @@
     margin: 0;
 }
 
+/* Clickable image and name */
+.product-card a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.product-image:hover {
+    opacity: 0.8;
+}
+
+.product-name:hover {
+    text-decoration: underline;
+}
+
 /* Fewer columns on small screens 
 @media (max-width: 800px) {
     .product-grid {
