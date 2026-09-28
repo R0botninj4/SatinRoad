@@ -1,0 +1,57 @@
+﻿.listings-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+}
+
+.back-link {
+    align-self: flex-start;
+    color: inherit;
+}
+
+/* Product image + name at the top */
+.listings-product {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.listings-product-image {
+    width: min(400px, 100%);
+    aspect-ratio: 3 / 1;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.listings-product h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Full-width rows separated by lines */
+.listings-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.listings-table th,
+.listings-table td {
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid currentColor;
+}
+
+.listings-table thead th {
+    border-top: 1px solid currentColor;
+    font-weight: 600;
+}
+
+/* Right-align the price column */
+.listings-table th:last-child,
+.listings-table td:last-child {
+    text-align: right;
+}
