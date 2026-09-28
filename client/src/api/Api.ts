@@ -10,6 +10,11 @@
  * ---------------------------------------------------------------
  */
 
+export interface Category {
+  id?: string;
+  name?: string;
+}
+
 export interface WeatherForecast {
   /** @format date */
   date?: string;
@@ -283,6 +288,22 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
+  api = {
+    /**
+     * No description
+     *
+     * @tags Category
+     * @name CategoryGetAll
+     * @request GET:/api/categories
+     */
+    categoryGetAll: (params: RequestParams = {}) =>
+      this.request<Category[], any>({
+        path: `/api/categories`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
   weatherForecast = {
     /**
      * No description
