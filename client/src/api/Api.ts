@@ -10,6 +10,16 @@
  * ---------------------------------------------------------------
  */
 
+export interface Category {
+  id?: string;
+  name?: string;
+}
+
+export interface CreateCategoryRequestDto {
+  /** @minLength 1 */
+  name: string;
+}
+
 export interface WeatherForecast {
   /** @format date */
   date?: string;
@@ -283,6 +293,42 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
+  api = {
+    /**
+     * No description
+     *
+     * @tags Category
+     * @name CategoryGetAll
+     * @request GET:/api/categories
+     */
+    categoryGetAll: (params: RequestParams = {}) =>
+      this.request<Category[], any>({
+        path: `/api/categories`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Category
+     * @name CategoryCreate
+     * @request POST:/api/categories
+     */
+    categoryCreate: (
+      data: CreateCategoryRequestDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<Category, any>({
+        path: `/api/categories`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
   weatherForecast = {
     /**
      * No description

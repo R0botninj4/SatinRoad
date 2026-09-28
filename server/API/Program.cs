@@ -1,5 +1,6 @@
 using Infra;
 using LinqToDB;
+using Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ var dataOptions = new DataOptions<MyDatabaseConnection>(options);
 
 builder.Services.AddScoped<MyDatabaseConnection>(
     _ => new MyDatabaseConnection(dataOptions));
+
+builder.Services.AddScoped<CategoryService>();
 
 var app = builder.Build();
 
