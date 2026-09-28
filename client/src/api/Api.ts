@@ -30,6 +30,12 @@ export interface CreateCategoryRequestDto {
   name: string;
 }
 
+export interface Item {
+  /** @format int32 */
+  id?: number;
+  name?: string;
+}
+
 export interface WeatherForecast {
   /** @format date */
   date?: string;
@@ -356,6 +362,21 @@ export class Api<
     ) =>
       this.request<Category, ProblemDetails>({
         path: `/api/categories/${id}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Item
+     * @name ItemGetAll
+     * @request GET:/api/items
+     */
+    itemGetAll: (params: RequestParams = {}) =>
+      this.request<Item[], any>({
+        path: `/api/items`,
         method: "GET",
         format: "json",
         ...params,

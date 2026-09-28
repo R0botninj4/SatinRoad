@@ -19,6 +19,7 @@ builder.Services.AddScoped<MyDatabaseConnection>(
     _ => new MyDatabaseConnection(dataOptions));
 
 builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<ItemService>();
 
 var app = builder.Build();
 
@@ -41,6 +42,27 @@ using (var scope = app.Services.CreateScope())
 
     db.CreateTable<Category>(
         tableOptions: TableOptions.CreateIfNotExists);
+
+    db.CreateTable<Item>(
+        tableOptions: TableOptions.CreateIfNotExists);
+
+    var items = new List<Item>
+    {
+        new() { Id = 1, Name = "Blaze rod" },
+        new() { Id = 2, Name = "Wheat" },
+        new() { Id = 3, Name = "Sugar" },
+        new() { Id = 4, Name = "Sugar cane" },
+        new() { Id = 5, Name = "TNT" },
+        new() { Id = 6, Name = "Seeds" }
+    };
+
+    foreach (var item in items)
+    {
+        if (!db.Items.Any(existingItem => existingItem.Id == item.Id))
+        {
+            db.Insert(item);
+        }
+    }
 }
 
 app.Run();
