@@ -39,6 +39,7 @@ builder.Services.AddScoped<MyDatabaseConnection>(
 
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ItemService>();
+builder.Services.AddScoped<ListingService>();
 
 var app = builder.Build();
 
@@ -67,6 +68,8 @@ using (var scope = app.Services.CreateScope())
     db.Execute("CREATE UNIQUE INDEX IF NOT EXISTS IX_Users_NormalizedUsername ON Users (NormalizedUsername)");
 
     db.CreateTable<Item>(
+        tableOptions: TableOptions.CreateIfNotExists);
+    db.CreateTable<Listing>(
         tableOptions: TableOptions.CreateIfNotExists);
 
     var items = new List<Item>
