@@ -1,6 +1,5 @@
 using Infra;
 using LinqToDB;
-using LinqToDB.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,17 +31,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-
-
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider
         .GetRequiredService<MyDatabaseConnection>();
 
-    var result = db.Execute<int>("SELECT 1");
-
-    app.Logger.LogInformation("Database connection test: {Result}", result);
+    db.CreateTable<Category>(
+        tableOptions: TableOptions.CreateIfNotExists);
 }
 
 app.Run();
