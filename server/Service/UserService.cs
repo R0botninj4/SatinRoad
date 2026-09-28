@@ -2,19 +2,13 @@ using System.ComponentModel.DataAnnotations;
 using Infra;
 using LinqToDB;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.Sqlite;
 
 namespace Service;
 
 public class UserService(MyDatabaseConnection db, IPasswordHasher<User> passwordHasher)
 {
-    private static readonly User DummyUser = new();
-    private static readonly string DummyHash = new PasswordHasher<User>()
-        .HashPassword(DummyUser, Guid.NewGuid().ToString());
-
     public UserResponseDto? Register(RegisterRequestDto dto)
     {
-        Validator.ValidateObject(dto, new ValidationContext(dto), true);
         var user = new User
         {
             Id = Guid.NewGuid().ToString(),
@@ -26,30 +20,16 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher<User> password
             return null;
 
         user.PasswordHash = passwordHasher.HashPassword(user, dto.Password);
-        try
-        {
-            db.Insert(user);
-        }
-        catch (SqliteException exception) when (exception.SqliteExtendedErrorCode == 2067)
-        {
-            // The database also protects against concurrent registrations of the same name.
-            return null;
-        }
+        db.Insert(user);
 
         return new UserResponseDto(user.Id, user.Username);
     }
 
     public UserResponseDto? Login(LoginRequestDto dto)
     {
-        Validator.ValidateObject(dto, new ValidationContext(dto), true);
         var normalized = dto.Username.ToUpperInvariant();
         var user = db.Users.FirstOrDefault(user => user.NormalizedUsername == normalized);
-        if (user is null)
-        {
-            // Do password verification work for unknown names as well.
-            passwordHasher.VerifyHashedPassword(DummyUser, DummyHash, dto.Password);
-            return null;
-        }
+        if (user is null) return null;
 
         var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password);
         if (result == PasswordVerificationResult.Failed) return null;

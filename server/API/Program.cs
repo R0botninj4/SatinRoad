@@ -2,9 +2,7 @@ using Infra;
 using LinqToDB;
 using LinqToDB.Data;
 using Microsoft.AspNetCore.Authentication.BearerToken;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.RateLimiting;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using Service;
@@ -28,24 +26,6 @@ builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<UserService>();
-
-var protection = builder.Services.AddDataProtection().SetApplicationName("SatinRoad");
-var keyPath = builder.Configuration["DataProtection:KeyPath"];
-if (!string.IsNullOrWhiteSpace(keyPath))
-    protection.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
-
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    options.AddPolicy("auth", context => RateLimitPartition.GetFixedWindowLimiter(
-        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-        _ => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = 10,
-            Window = TimeSpan.FromMinutes(1),
-            QueueLimit = 0
-        }));
-});
 
 var connectionString = builder.Configuration
                            .GetConnectionString("DefaultConnection")
@@ -72,7 +52,6 @@ app.UseSwaggerUi();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseRateLimiter();
 
 app.MapControllers();
 

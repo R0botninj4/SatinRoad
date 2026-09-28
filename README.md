@@ -78,19 +78,12 @@ The existing category and item endpoints keep their current public access.
 In Swagger, register a user, log in, copy `accessToken`, click **Authorize**,
 and paste the token. Then execute `/api/auth/me`.
 
-Tokens use ASP.NET Core's built-in opaque bearer format, not JWT, and expire
-after one hour. The framework also returns a refresh token, but this version
-does not expose a refresh endpoint: log in again after expiry. Client-side
-logout removes the token; it does not revoke an already issued token.
-Docker persists token protection keys inside the database volume at `/app/data/keys`.
-Protect that volume and use HTTPS when deploying beyond localhost.
-
-Registration and login share a limit of ten requests per minute per client IP;
-excess requests receive 429. This limit is per running API instance.
+Tokens use ASP.NET Core's built-in bearer format and expire after one hour.
+The client should remove the token when the user logs out.
 
 Validation used a separate temporary SQLite database: registration, duplicate
 usernames, invalid input, login, incorrect passwords, authenticated and anonymous
-`me`, invalid tokens, rate limiting and Swagger security metadata.
+`me`, invalid tokens and Swagger security metadata.
 Unit tests are deferred to the planned Test Last phase.
 
 ## Earlier setup validation
