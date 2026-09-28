@@ -61,7 +61,39 @@ The backend must be running before starting the frontend.
 The frontend dev command automatically generates the API client
 from Swagger. Docker uses the generated client already in the repository.
 
-## Current validation
+## Backend accounts
+
+All accounts have the same access; there are no roles in this implementation.
+The existing category and item endpoints keep their current public access.
+
+- `POST /api/auth/register`: send `username` and `password`; returns 201 with
+  the user's ID and username, 400 for invalid input or 409 for a taken username.
+- Usernames are 3–30 ASCII letters, numbers or underscores and are unique
+  regardless of casing. Passwords are 12–128 characters and are stored using
+  ASP.NET Core's PasswordHasher, never as plaintext or in API responses.
+- `POST /api/auth/login`: send the same fields; returns an access token or 401.
+- `GET /api/auth/me`: requires `Authorization: Bearer <accessToken>` and returns
+  the current user's ID and username. Anonymous or invalid tokens receive 401.
+
+In Swagger, register a user, log in, copy `accessToken`, click **Authorize**,
+and paste the token. Then execute `/api/auth/me`.
+
+Tokens use ASP.NET Core's built-in opaque bearer format, not JWT, and expire
+after one hour. The framework also returns a refresh token, but this version
+does not expose a refresh endpoint: log in again after expiry. Client-side
+logout removes the token; it does not revoke an already issued token.
+Docker persists token protection keys inside the database volume at `/app/data/keys`.
+Protect that volume and use HTTPS when deploying beyond localhost.
+
+Registration and login share a limit of ten requests per minute per client IP;
+excess requests receive 429. This limit is per running API instance.
+
+Validation used a separate temporary SQLite database: registration, duplicate
+usernames, invalid input, login, incorrect passwords, authenticated and anonymous
+`me`, invalid tokens, rate limiting and Swagger security metadata.
+Unit tests are deferred to the planned Test Last phase.
+
+## Earlier setup validation
 
 - Frontend and backend images build and start.
 - React retrieves data from the backend through the generated client.

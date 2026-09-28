@@ -1,12 +1,51 @@
 using Infra;
 using LinqToDB;
+using LinqToDB.Data;
+using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.RateLimiting;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 using Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApiDocument();
+builder.Services.AddOpenApiDocument(config =>
+{
+    config.AddSecurity("Bearer", new OpenApiSecurityScheme
+    {
+        Type = OpenApiSecuritySchemeType.Http,
+        Scheme = "bearer",
+        Description = "Paste the accessToken returned by POST /api/auth/login."
+    });
+    config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
+});
 builder.Services.AddCors();
+builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme)
+    .AddBearerToken(options => options.BearerTokenExpiration = TimeSpan.FromHours(1));
+builder.Services.AddAuthorization();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<UserService>();
+
+var protection = builder.Services.AddDataProtection().SetApplicationName("SatinRoad");
+var keyPath = builder.Configuration["DataProtection:KeyPath"];
+if (!string.IsNullOrWhiteSpace(keyPath))
+    protection.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("auth", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 10,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        }));
+});
 
 var connectionString = builder.Configuration
                            .GetConnectionString("DefaultConnection")
@@ -31,7 +70,9 @@ app.UseCors(config => config
 app.UseOpenApi();
 app.UseSwaggerUi();
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 
@@ -42,6 +83,9 @@ using (var scope = app.Services.CreateScope())
 
     db.CreateTable<Category>(
         tableOptions: TableOptions.CreateIfNotExists);
+
+    db.CreateTable<User>(tableOptions: TableOptions.CreateIfNotExists);
+    db.Execute("CREATE UNIQUE INDEX IF NOT EXISTS IX_Users_NormalizedUsername ON Users (NormalizedUsername)");
 
     db.CreateTable<Item>(
         tableOptions: TableOptions.CreateIfNotExists);

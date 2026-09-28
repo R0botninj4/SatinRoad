@@ -4,6 +4,7 @@ services:
   api:
     build: ./server
     environment:
+      DataProtection__KeyPath: "/app/data/keys"
       ConnectionStrings__DefaultConnection: "Data Source=/app/data/satinroad.db"
     ports:
       - "127.0.0.1:5188:8080"

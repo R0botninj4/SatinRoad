@@ -10,4 +10,5 @@ public class MyDatabaseConnection
     public ITable<Category> Categories => this.GetTable<Category>();
 
     public ITable<Item> Items => this.GetTable<Item>();
+    public ITable<User> Users => this.GetTable<User>();
 }
