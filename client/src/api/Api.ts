@@ -15,6 +15,16 @@ export interface Category {
   name?: string;
 }
 
+export interface ProblemDetails {
+  type?: string | null;
+  title?: string | null;
+  /** @format int32 */
+  status?: number | null;
+  detail?: string | null;
+  instance?: string | null;
+  [key: string]: any;
+}
+
 export interface CreateCategoryRequestDto {
   /** @minLength 1 */
   name: string;
@@ -28,6 +38,10 @@ export interface WeatherForecast {
   /** @format int32 */
   temperatureF?: number;
   summary?: string | null;
+}
+
+export interface CategoryGetByIdParams {
+  id: string;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -325,6 +339,24 @@ export class Api<
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Category
+     * @name CategoryGetById
+     * @request GET:/api/categories/{id}
+     */
+    categoryGetById: (
+      { id }: CategoryGetByIdParams,
+      params: RequestParams = {},
+    ) =>
+      this.request<Category, ProblemDetails>({
+        path: `/api/categories/${id}`,
+        method: "GET",
         format: "json",
         ...params,
       }),

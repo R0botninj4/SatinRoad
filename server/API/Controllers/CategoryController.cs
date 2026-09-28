@@ -15,6 +15,20 @@ public class CategoryController(CategoryService categoryService)
     {
         return categoryService.GetAll();
     }
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(Category), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<Category> GetById(string id)
+    {
+        var category = categoryService.GetById(id);
+
+        if (category is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(category);
+    }
 
     [HttpPost]
     public ActionResult<Category> Create(CreateCategoryRequestDto dto)

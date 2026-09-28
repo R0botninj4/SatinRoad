@@ -10,7 +10,10 @@ public class CategoryService(MyDatabaseConnection db)
     {
         return db.Categories.ToList();
     }
-
+    public Category? GetById(string id)
+    {
+        return db.Categories.FirstOrDefault(category => category.Id == id);
+    }
     public Category Create(CreateCategoryRequestDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Name))
