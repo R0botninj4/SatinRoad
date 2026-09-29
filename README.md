@@ -71,19 +71,11 @@ The existing category and item endpoints keep their current public access.
 - Usernames are 3–30 ASCII letters, numbers or underscores and are unique
   regardless of casing. Passwords are 12–128 characters and are stored using
   ASP.NET Core's PasswordHasher, never as plaintext or in API responses.
-- `POST /api/auth/login`: send the same fields; returns an access token or 401.
-- `GET /api/auth/me`: requires `Authorization: Bearer <accessToken>` and returns
-  the current user's ID and username. Anonymous or invalid tokens receive 401.
-
-In Swagger, register a user, log in, copy `accessToken`, click **Authorize**,
-and paste the token. Then execute `/api/auth/me`.
-
-Tokens use ASP.NET Core's built-in bearer format and expire after one hour.
-The client should remove the token when the user logs out.
+- `POST /api/auth/login`: send the same fields; returns the user's ID and
+  username or 401 when the credentials are incorrect.
 
 Validation used a separate temporary SQLite database: registration, duplicate
-usernames, invalid input, login, incorrect passwords, authenticated and anonymous
-`me`, invalid tokens and Swagger security metadata.
+usernames, invalid input, successful login and incorrect passwords.
 Unit tests are deferred to the planned Test Last phase.
 
 ## Earlier setup validation

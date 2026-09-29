@@ -1,28 +1,17 @@
 using Infra;
 using LinqToDB;
 using LinqToDB.Data;
-using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
-using NSwag;
-using NSwag.Generation.Processors.Security;
 using Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApiDocument(config =>
-{
-    config.AddSecurity("Bearer", new OpenApiSecurityScheme
-    {
-        Type = OpenApiSecuritySchemeType.Http,
-        Scheme = "bearer",
-        Description = "Paste the accessToken returned by POST /api/auth/login."
-    });
-    config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
-});
+builder.Services.AddOpenApiDocument();
 builder.Services.AddCors();
-builder.Services.AddAuthentication(BearerTokenDefaults.AuthenticationScheme)
-    .AddBearerToken(options => options.BearerTokenExpiration = TimeSpan.FromHours(1));
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options => options.Cookie.Name = "SatinRoad.Auth");
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<UserService>();
@@ -39,6 +28,7 @@ builder.Services.AddScoped<MyDatabaseConnection>(
 
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ItemService>();
+builder.Services.AddScoped<ListingService>();
 
 var app = builder.Build();
 
@@ -67,6 +57,8 @@ using (var scope = app.Services.CreateScope())
     db.Execute("CREATE UNIQUE INDEX IF NOT EXISTS IX_Users_NormalizedUsername ON Users (NormalizedUsername)");
 
     db.CreateTable<Item>(
+        tableOptions: TableOptions.CreateIfNotExists);
+    db.CreateTable<Listing>(
         tableOptions: TableOptions.CreateIfNotExists);
 
     var items = new List<Item>
