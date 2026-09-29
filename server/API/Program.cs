@@ -1,6 +1,7 @@
 using Infra;
 using LinqToDB;
 using LinqToDB.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Service;
 
@@ -9,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApiDocument();
 builder.Services.AddCors();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options => options.Cookie.Name = "SatinRoad.Auth");
+builder.Services.AddAuthorization();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<UserService>();
 
@@ -35,6 +39,9 @@ app.UseCors(config => config
 
 app.UseOpenApi();
 app.UseSwaggerUi();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

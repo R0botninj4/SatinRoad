@@ -4,9 +4,6 @@ namespace Service;
 
 public class CreateListingRequestDto
 {
-    [Required]
-    public string UserId { get; set; } = "";
-
     [Range(1, int.MaxValue)]
     public int ItemId { get; set; }
 

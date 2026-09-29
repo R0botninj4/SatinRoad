@@ -13,9 +13,9 @@ public class ListingService(MyDatabaseConnection db)
             .ToList();
     }
 
-    public Listing Create(CreateListingRequestDto dto)
+    public Listing Create(string userId, CreateListingRequestDto dto)
     {
-        var userExists = db.Users.Any(user => user.Id == dto.UserId);
+        var userExists = db.Users.Any(user => user.Id == userId);
 
         if (!userExists)
         {
@@ -32,7 +32,7 @@ public class ListingService(MyDatabaseConnection db)
         var listing = new Listing
         {
             Id = Guid.NewGuid().ToString(),
-            UserId = dto.UserId,
+            UserId = userId,
             ItemId = dto.ItemId,
             Price = dto.Price,
             Quantity = dto.Quantity,
