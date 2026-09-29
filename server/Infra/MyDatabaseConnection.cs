@@ -14,4 +14,6 @@ public class MyDatabaseConnection
     public ITable<User> Users => this.GetTable<User>();
 
     public ITable<Listing> Listings => this.GetTable<Listing>();
+
+    public ITable<Order> Orders => this.GetTable<Order>();
 }
