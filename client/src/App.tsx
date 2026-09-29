@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, RouterProvider, type RouteObject } from 
 import { MainPage } from "./pages/MainPage";
 import "./index.css";
 import { ProductListingsPage } from "./pages/ProductListingsPage";
+import { PanoramaBackground } from "./components/PanoramaBackground";
 
 const routes: RouteObject[] = [
     { path: "/", element: <MainPage /> },
@@ -12,7 +13,11 @@ const routes: RouteObject[] = [
 const router = createBrowserRouter(routes);
 
 export function App() {
-    return <RouterProvider router={router} />;
+    return (
+        <>
+            <PanoramaBackground />
+            <RouterProvider router={router} />
+        </>
+    );
 }
-
 export default App;

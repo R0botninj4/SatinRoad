@@ -1,6 +1,7 @@
 ﻿import { Link, useParams } from "react-router-dom";
 import { getListingsForProduct, products } from "../TempData/Mockdata.ts";
 import "./ProductListingsPage.css";
+import { Fragment } from "react";
 
 export function ProductListingsPage() {
     const { id } = useParams();
@@ -22,7 +23,9 @@ export function ProductListingsPage() {
             <Link to="/" className="back-link">Go back to main page</Link>
 
             <div className="listings-product">
-                <div className="listings-product-image">Product image</div>
+                <div className="listings-product-image">
+                    <img src={product.image} alt="" />
+                </div>
                 <h1>{product.name}</h1>
             </div>
 
@@ -38,12 +41,19 @@ export function ProductListingsPage() {
                     </tr>
                     </thead>
                     <tbody>
-                    {productListings.map((listing) => (
-                        <tr key={listing.id}>
-                            <td>{listing.vendor}</td>
-                            <td>{listing.quantity}</td>
-                            <td>{listing.pricePerItem.toFixed(2)} kr</td>
-                        </tr>
+                    {productListings.map((listing, index) => (
+                        <Fragment key={listing.id}>
+                            {index > 0 && (
+                                <tr className="sign-divider" aria-hidden="true">
+                                    <td colSpan={3} />
+                                </tr>
+                            )}
+                            <tr>
+                                <td>{listing.vendor}</td>
+                                <td>{listing.quantity}</td>
+                                <td>{listing.pricePerItem.toFixed(2)} kr</td>
+                            </tr>
+                        </Fragment>
                     ))}
                     </tbody>
                 </table>

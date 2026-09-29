@@ -10,9 +10,9 @@
  * ---------------------------------------------------------------
  */
 
-export interface Category {
+export interface UserResponseDto {
   id?: string;
-  name?: string;
+  username?: string;
 }
 
 export interface ProblemDetails {
@@ -23,6 +23,46 @@ export interface ProblemDetails {
   detail?: string | null;
   instance?: string | null;
   [key: string]: any;
+}
+
+export interface RegisterRequestDto {
+  /**
+   * @minLength 3
+   * @maxLength 30
+   * @pattern [a-zA-Z0-9_]+
+   */
+  username: string;
+  /**
+   * @minLength 12
+   * @maxLength 128
+   */
+  password: string;
+}
+
+export interface AccessTokenResponse {
+  tokenType?: string;
+  accessToken: string;
+  /** @format int64 */
+  expiresIn: number;
+  refreshToken: string;
+}
+
+export interface LoginRequestDto {
+  /**
+   * @minLength 0
+   * @maxLength 30
+   */
+  username: string;
+  /**
+   * @minLength 0
+   * @maxLength 128
+   */
+  password: string;
+}
+
+export interface Category {
+  id?: string;
+  name?: string;
 }
 
 export interface CreateCategoryRequestDto {
@@ -314,6 +354,57 @@ export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
   api = {
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthRegister
+     * @request POST:/api/auth/register
+     */
+    authRegister: (data: RegisterRequestDto, params: RequestParams = {}) =>
+      this.request<UserResponseDto, ProblemDetails>({
+        path: `/api/auth/register`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthLogin
+     * @request POST:/api/auth/login
+     */
+    authLogin: (data: LoginRequestDto, params: RequestParams = {}) =>
+      this.request<AccessTokenResponse, ProblemDetails>({
+        path: `/api/auth/login`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthMe
+     * @request GET:/api/auth/me
+     * @secure
+     */
+    authMe: (params: RequestParams = {}) =>
+      this.request<UserResponseDto, ProblemDetails>({
+        path: `/api/auth/me`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
     /**
      * No description
      *

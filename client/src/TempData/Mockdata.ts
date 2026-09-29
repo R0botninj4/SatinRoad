@@ -1,7 +1,15 @@
 ﻿// Temporary fake data – will be replaced with data from the backend
+import blazeRodImage from "../assets/product-images/Blaze-rod.png";
+import wheatImage from "../assets/product-images/Wheat.png";
+import sugarImage from "../assets/product-images/Sugar.png";
+import sugarCaneImage from "../assets/product-images/Sugar-cane.png";
+import tntImage from "../assets/product-images/Tnt.png";
+import seedsImage from "../assets/product-images/Seeds.png";
+
 export type Product = {
     id: number;
     name: string;
+    image: string;
 };
 
 export type Listing = {
@@ -13,12 +21,12 @@ export type Listing = {
 };
 
 export const products: Product[] = [
-    { id: 1, name: "Blaze rod" },
-    { id: 2, name: "Wheat" },
-    { id: 3, name: "Sugar" },
-    { id: 4, name: "Sugar cane" },
-    { id: 5, name: "TNT" },
-    { id: 6, name: "Seeds" },
+    { id: 1, name: "Blaze rod", image: blazeRodImage },
+    { id: 2, name: "Wheat", image: wheatImage },
+    { id: 3, name: "Sugar", image: sugarImage },
+    { id: 4, name: "Sugar cane", image: sugarCaneImage },
+    { id: 5, name: "TNT", image: tntImage },
+    { id: 6, name: "Seeds", image: seedsImage },
 ];
 
 export const listings: Listing[] = [
