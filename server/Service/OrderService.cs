@@ -45,4 +45,11 @@ public class OrderService(MyDatabaseConnection db)
 
         return order;
     }
+    public List<Order> GetMyOrders(string buyerId)
+    {
+        return db.Orders
+            .Where(order => order.BuyerId == buyerId)
+            .OrderByDescending(order => order.CreatedAt)
+            .ToList();
+    }
 }
