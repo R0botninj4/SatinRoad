@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Infra;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 
@@ -10,14 +12,23 @@ namespace API.Controllers;
 public class OrderController(OrderService orderService)
     : ControllerBase
 {
+    [Authorize]
     [HttpPost]
     [ProducesResponseType(typeof(Order), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public ActionResult<Order> Create(CreateOrderRequestDto dto)
     {
         try
         {
-            var order = orderService.Create(dto);
+            var buyerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (buyerId is null)
+            {
+                return Unauthorized();
+            }
+
+            var order = orderService.Create(buyerId, dto);
 
             return Created($"/api/orders/{order.Id}", order);
         }

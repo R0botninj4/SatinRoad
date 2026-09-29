@@ -5,9 +5,6 @@ namespace Service;
 public class CreateOrderRequestDto
 {
     [Required]
-    public string BuyerId { get; set; } = "";
-
-    [Required]
     public string ListingId { get; set; } = "";
 
     [Range(1, int.MaxValue)]

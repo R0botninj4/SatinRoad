@@ -6,9 +6,9 @@ namespace Service;
 
 public class OrderService(MyDatabaseConnection db)
 {
-    public Order Create(CreateOrderRequestDto dto)
+    public Order Create(string buyerId, CreateOrderRequestDto dto)
     {
-        var buyerExists = db.Users.Any(user => user.Id == dto.BuyerId);
+        var buyerExists = db.Users.Any(user => user.Id == buyerId);
 
         if (!buyerExists)
         {
@@ -31,7 +31,7 @@ public class OrderService(MyDatabaseConnection db)
         var order = new Order
         {
             Id = Guid.NewGuid().ToString(),
-            BuyerId = dto.BuyerId,
+            BuyerId = buyerId,
             ListingId = dto.ListingId,
             Quantity = dto.Quantity,
             TotalPrice = listing.Price * dto.Quantity,
