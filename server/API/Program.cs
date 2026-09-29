@@ -29,6 +29,7 @@ builder.Services.AddScoped<MyDatabaseConnection>(
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<ListingService>();
+builder.Services.AddScoped<OrderService>();
 
 var app = builder.Build();
 
@@ -59,6 +60,8 @@ using (var scope = app.Services.CreateScope())
     db.CreateTable<Item>(
         tableOptions: TableOptions.CreateIfNotExists);
     db.CreateTable<Listing>(
+        tableOptions: TableOptions.CreateIfNotExists);
+    db.CreateTable<Order>(
         tableOptions: TableOptions.CreateIfNotExists);
 
     var items = new List<Item>
