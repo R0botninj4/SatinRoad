@@ -1,0 +1,27 @@
+﻿.auth-status {
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.auth-status-link {
+    font: inherit;
+    color: inherit;
+    text-shadow: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.auth-status-link:hover {
+    text-decoration: underline;
+}
+
+.auth-status-link:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}

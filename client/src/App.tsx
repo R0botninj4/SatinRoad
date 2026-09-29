@@ -3,10 +3,13 @@ import { MainPage } from "./pages/MainPage";
 import "./index.css";
 import { ProductListingsPage } from "./pages/ProductListingsPage";
 import { PanoramaBackground } from "./components/PanoramaBackground";
+import { LoginPage } from "./pages/LoginPage";
+import { AuthProvider } from "./auth/AuthProvider";
 
 const routes: RouteObject[] = [
     { path: "/", element: <MainPage /> },
-    { path: "/products/:id", element: <ProductListingsPage /> }, 
+    { path: "/login", element: <LoginPage /> },
+    { path: "/products/:id", element: <ProductListingsPage /> },
     { path: "*", element: <Navigate to="/" /> },
 ];
 
@@ -16,7 +19,9 @@ export function App() {
     return (
         <>
             <PanoramaBackground />
-            <RouterProvider router={router} />
+            <AuthProvider>
+                <RouterProvider router={router} />
+            </AuthProvider>
         </>
     );
 }
