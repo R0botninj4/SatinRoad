@@ -115,8 +115,6 @@ export interface Order {
 
 export interface CreateOrderRequestDto {
   /** @minLength 1 */
-  buyerId: string;
-  /** @minLength 1 */
   listingId: string;
   /**
    * @format int32
@@ -431,35 +429,6 @@ export class Api<
     /**
      * No description
      *
-     * @tags Auth
-     * @name AuthLogout
-     * @request POST:/api/auth/logout
-     */
-    authLogout: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/api/auth/logout`,
-        method: "POST",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Auth
-     * @name AuthMe
-     * @request GET:/api/auth/me
-     */
-    authMe: (params: RequestParams = {}) =>
-      this.request<UserResponseDto, ProblemDetails>({
-        path: `/api/auth/me`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
      * @tags Category
      * @name CategoryGetAll
      * @request GET:/api/categories
@@ -573,6 +542,21 @@ export class Api<
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Order
+     * @name OrderGetMyOrders
+     * @request GET:/api/orders/my-orders
+     */
+    orderGetMyOrders: (params: RequestParams = {}) =>
+      this.request<Order[], ProblemDetails>({
+        path: `/api/orders/my-orders`,
+        method: "GET",
         format: "json",
         ...params,
       }),
