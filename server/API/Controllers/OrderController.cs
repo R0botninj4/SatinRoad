@@ -37,4 +37,19 @@ public class OrderController(OrderService orderService)
             return BadRequest(exception.Message);
         }
     }
+    [Authorize]
+    [HttpGet("my-orders")]
+    [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public ActionResult<List<Order>> GetMyOrders()
+    {
+        var buyerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (buyerId is null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(orderService.GetMyOrders(buyerId));
+    }
 }
