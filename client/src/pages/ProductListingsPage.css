@@ -73,3 +73,24 @@
     width: auto;
     image-rendering: pixelated;
 }
+
+/* Remove the old lines between rows */
+.listings-table th,
+.listings-table td {
+    border-bottom: none;
+}
+
+/* Minecraft sign-style divider between listings */
+.sign-divider td {
+    padding: 0 1rem;
+    text-align: left;
+}
+
+.sign-divider td::before {
+    content: "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" / "";
+    display: block;
+    width: 0;
+    min-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}

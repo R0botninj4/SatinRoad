@@ -16,6 +16,17 @@
     font-size: 2rem;
 }
 
+/* Minecraft sign-style divider above and below the price */
+.product-info p:first-of-type::before,
+.product-info p:first-of-type::after {
+    content: "------------------------------------------------------------------------------------------------------------------------------------------------------" / "";
+    display: block;
+    width: 0;
+    min-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 /* Three cards per row */
 .product-grid {
     display: grid;
