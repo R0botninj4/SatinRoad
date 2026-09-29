@@ -18,6 +18,11 @@
     gap: 0.75rem;
 }
 
+.listings-product h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
 /* Item frame behind the product icon */
 .listings-product-image {
     display: flex;
@@ -29,12 +34,14 @@
     image-rendering: pixelated;
 }
 
-.listings-product h1 {
-    margin: 0;
-    font-size: 1.5rem;
+/* Product icon inside the frame */
+.listings-product-image img {
+    height: 50%;
+    width: auto;
+    image-rendering: pixelated;
 }
 
-/* Full-width rows separated by lines */
+/* One big oak sign behind the whole table */
 .listings-table {
     width: 100%;
     border-collapse: collapse;
@@ -47,17 +54,10 @@
 
 .listings-table th,
 .listings-table td {
-    border-bottom-color: #4a3a22;
-}
-
-.listings-table th,
-.listings-table td {
     padding: 0.9rem 1rem;
-    border-bottom: 1px solid currentColor;
 }
 
 .listings-table thead th {
-    border-top: 1px solid currentColor;
     font-weight: 600;
 }
 
@@ -65,19 +65,6 @@
 .listings-table th:last-child,
 .listings-table td:last-child {
     text-align: right;
-}
-
-/* Product icon inside the banner box */
-.listings-product-image img {
-    height: 80%;
-    width: auto;
-    image-rendering: pixelated;
-}
-
-/* Remove the old lines between rows */
-.listings-table th,
-.listings-table td {
-    border-bottom: none;
 }
 
 /* Minecraft sign-style divider between listings */

@@ -6,9 +6,9 @@
 
 :root {
   font-family: "Mojangles", system-ui, Arial, sans-serif;
-  line-height: 1.5;
   font-size: 20px;
-  color-scheme: light dark;
+  line-height: 1.5;
+  color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 }
@@ -19,7 +19,6 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  position: relative;
 }
 
 /* Let pages use the full width (up to a max) */
@@ -28,11 +27,6 @@ body {
   max-width: 1100px;
   padding: 2rem;
   box-sizing: border-box;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
 }
 
 /* Turn off animations for users who prefer reduced motion */
