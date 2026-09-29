@@ -2,10 +2,13 @@
 import { getListingsForProduct, products } from "../TempData/Mockdata.ts";
 import "./MainPage.css";
 import logo from "../assets/SatinRoadLogo.png";
+import { AuthStatus } from "../components/AuthStatus";
 
 export function MainPage() {
     return (
         <section className="main-page">
+            <AuthStatus />
+
             <header className="main-page-title">
                 <h1>
                     <img src={logo} alt="Minecraft Road" className="SatinRoadLogo" />

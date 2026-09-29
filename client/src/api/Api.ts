@@ -39,14 +39,6 @@ export interface RegisterRequestDto {
   password: string;
 }
 
-export interface AccessTokenResponse {
-  tokenType?: string;
-  accessToken: string;
-  /** @format int64 */
-  expiresIn: number;
-  refreshToken: string;
-}
-
 export interface LoginRequestDto {
   /**
    * @minLength 0
@@ -76,14 +68,62 @@ export interface Item {
   name?: string;
 }
 
-export interface WeatherForecast {
-  /** @format date */
-  date?: string;
+export interface Listing {
+  id?: string;
+  userId?: string;
   /** @format int32 */
-  temperatureC?: number;
+  itemId?: number;
+  /** @format decimal */
+  price?: number;
   /** @format int32 */
-  temperatureF?: number;
-  summary?: string | null;
+  quantity?: number;
+  description?: string;
+}
+
+export interface CreateListingRequestDto {
+  /**
+   * @format int32
+   * @min 1
+   * @max 2147483647
+   */
+  itemId?: number;
+  /**
+   * @format decimal
+   * @min 0.01
+   */
+  price?: number;
+  /**
+   * @format int32
+   * @min 1
+   * @max 2147483647
+   */
+  quantity?: number;
+  description?: string;
+}
+
+export interface Order {
+  id?: string;
+  buyerId?: string;
+  listingId?: string;
+  /** @format int32 */
+  quantity?: number;
+  /** @format decimal */
+  totalPrice?: number;
+  /** @format date-time */
+  createdAt?: string;
+}
+
+export interface CreateOrderRequestDto {
+  /** @minLength 1 */
+  buyerId: string;
+  /** @minLength 1 */
+  listingId: string;
+  /**
+   * @format int32
+   * @min 1
+   * @max 2147483647
+   */
+  quantity?: number;
 }
 
 export interface CategoryGetByIdParams {
@@ -379,7 +419,7 @@ export class Api<
      * @request POST:/api/auth/login
      */
     authLogin: (data: LoginRequestDto, params: RequestParams = {}) =>
-      this.request<AccessTokenResponse, ProblemDetails>({
+      this.request<UserResponseDto, ProblemDetails>({
         path: `/api/auth/login`,
         method: "POST",
         body: data,
@@ -392,15 +432,27 @@ export class Api<
      * No description
      *
      * @tags Auth
+     * @name AuthLogout
+     * @request POST:/api/auth/logout
+     */
+    authLogout: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/auth/logout`,
+        method: "POST",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
      * @name AuthMe
      * @request GET:/api/auth/me
-     * @secure
      */
     authMe: (params: RequestParams = {}) =>
       this.request<UserResponseDto, ProblemDetails>({
         path: `/api/auth/me`,
         method: "GET",
-        secure: true,
         format: "json",
         ...params,
       }),
@@ -472,19 +524,55 @@ export class Api<
         format: "json",
         ...params,
       }),
-  };
-  weatherForecast = {
+
     /**
      * No description
      *
-     * @tags WeatherForecast
-     * @name WeatherForecastGet
-     * @request GET:/WeatherForecast
+     * @tags Listing
+     * @name ListingGetAll
+     * @request GET:/api/listings
      */
-    weatherForecastGet: (params: RequestParams = {}) =>
-      this.request<WeatherForecast[], any>({
-        path: `/WeatherForecast`,
+    listingGetAll: (params: RequestParams = {}) =>
+      this.request<Listing[], any>({
+        path: `/api/listings`,
         method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Listing
+     * @name ListingCreate
+     * @request POST:/api/listings
+     */
+    listingCreate: (
+      data: CreateListingRequestDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<Listing, ProblemDetails>({
+        path: `/api/listings`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Order
+     * @name OrderCreate
+     * @request POST:/api/orders
+     */
+    orderCreate: (data: CreateOrderRequestDto, params: RequestParams = {}) =>
+      this.request<Order, ProblemDetails>({
+        path: `/api/orders`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
