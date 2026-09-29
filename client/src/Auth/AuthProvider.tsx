@@ -1,4 +1,4 @@
-﻿import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+﻿import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { UserResponseDto } from "../api/Api";
 import { api } from "./apiClient";
 
@@ -15,16 +15,9 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserResponseDto | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
-    // The login cookie is HttpOnly, so ask the API who we are on page load.
-    useEffect(() => {
-        api.api
-            .authMe()
-            .then(setUser)
-            .catch(() => setUser(null))
-            .finally(() => setLoading(false));
-    }, []);
+    
 
     const login = useCallback(async (username: string, password: string) => {
         setUser(await api.api.authLogin({ username, password }));
@@ -40,11 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     const logout = useCallback(async () => {
-        try {
-            await api.api.authLogout();
-        } finally {
-            setUser(null);
-        }
+        setUser(null);
     }, []);
 
     const value = useMemo(
