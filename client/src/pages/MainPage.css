@@ -30,17 +30,26 @@
     gap: 0.75rem;
 }
 
-/* Grey placeholder until real images exist */
+/* Item frame behind each product icon */
 .product-image {
-    aspect-ratio: 4 / 3;
-    border: 2px solid currentColor;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 65%;
+    align-self: center;
+    aspect-ratio: 1 / 1;
+    background: url("../assets/Item-frame.png") center / contain no-repeat;
+    image-rendering: pixelated;
 }
 
+/* Oak sign behind the product text */
 .product-info {
-    text-align: left;
+    text-align: center;
+    background: url("../assets/Sign.png") top left / 128px 64px repeat;
+    image-rendering: pixelated;
+    border: 3px solid #4a3a22;
+    padding: 0.75rem 1rem;
+    color: #2b1d0e;
 }
 
 .product-info h2 {
@@ -64,6 +73,20 @@
 
 .product-name:hover {
     text-decoration: underline;
+}
+
+/* Product icon inside the image box */
+.product-image img {
+    width: 50%;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+/* Logo in the title */
+.main-page-logo {
+    display: block;
+    max-width: min(600px, 100%);
+    height: auto;
 }
 
 /* Fewer columns on small screens 

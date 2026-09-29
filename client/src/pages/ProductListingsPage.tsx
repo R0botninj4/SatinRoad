@@ -22,7 +22,9 @@ export function ProductListingsPage() {
             <Link to="/" className="back-link">Go back to main page</Link>
 
             <div className="listings-product">
-                <div className="listings-product-image">Product image</div>
+                <div className="listings-product-image">
+                    <img src={product.image} alt="" />
+                </div>
                 <h1>{product.name}</h1>
             </div>
 

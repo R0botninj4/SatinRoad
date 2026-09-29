@@ -1,12 +1,15 @@
 ﻿import { Link } from "react-router-dom";
 import { getListingsForProduct, products } from "../TempData/Mockdata.ts";
 import "./MainPage.css";
+import logo from "../assets/SatinRoadLogo.png";
 
 export function MainPage() {
     return (
         <section className="main-page">
             <header className="main-page-title">
-                <h1>Minecraft Road</h1>
+                <h1>
+                    <img src={logo} alt="Minecraft Road" className="SatinRoadLogo" />
+                </h1>
             </header>
 
             <div className="product-grid">
@@ -21,7 +24,7 @@ export function MainPage() {
                     return (
                         <article key={product.id} className="product-card">
                             <Link to={`/products/${product.id}`} className="product-image">
-                                Product image
+                                <img src={product.image} alt={product.name} />
                             </Link>
 
                             <div className="product-info">

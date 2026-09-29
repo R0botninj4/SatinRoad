@@ -18,13 +18,15 @@
     gap: 0.75rem;
 }
 
+/* Item frame behind the product icon */
 .listings-product-image {
-    width: min(400px, 100%);
-    aspect-ratio: 3 / 1;
-    border: 2px solid currentColor;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 160px;
+    aspect-ratio: 1 / 1;
+    background: url("../assets/Item-frame.png") center / contain no-repeat;
+    image-rendering: pixelated;
 }
 
 .listings-product h1 {
@@ -37,6 +39,15 @@
     width: 100%;
     border-collapse: collapse;
     text-align: left;
+    background: url("../assets/Sign.png") top left / 128px 64px repeat;
+    image-rendering: pixelated;
+    border: 3px solid #4a3a22;
+    color: #2b1d0e;
+}
+
+.listings-table th,
+.listings-table td {
+    border-bottom-color: #4a3a22;
 }
 
 .listings-table th,
@@ -54,4 +65,11 @@
 .listings-table th:last-child,
 .listings-table td:last-child {
     text-align: right;
+}
+
+/* Product icon inside the banner box */
+.listings-product-image img {
+    height: 80%;
+    width: auto;
+    image-rendering: pixelated;
 }
