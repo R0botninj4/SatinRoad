@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Service;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace API.Controllers;
 
@@ -41,5 +43,36 @@ public class AuthController(UserService userService) : ControllerBase
             new ClaimsPrincipal(identity));
 
         return Ok(user);
+    }
+    [Authorize]
+    [HttpGet("me")]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public ActionResult<UserResponseDto> Me()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var user = userService.GetById(userId);
+
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(user);
+    }
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme);
+
+        return NoContent();
     }
 }

@@ -429,6 +429,35 @@ export class Api<
     /**
      * No description
      *
+     * @tags Auth
+     * @name AuthMe
+     * @request GET:/api/auth/me
+     */
+    authMe: (params: RequestParams = {}) =>
+      this.request<UserResponseDto, ProblemDetails>({
+        path: `/api/auth/me`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthLogout
+     * @request POST:/api/auth/logout
+     */
+    authLogout: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/auth/logout`,
+        method: "POST",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Category
      * @name CategoryGetAll
      * @request GET:/api/categories
