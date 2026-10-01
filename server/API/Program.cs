@@ -36,7 +36,9 @@ var app = builder.Build();
 app.UseCors(config => config
     .WithOrigins("http://localhost:3000")
     .AllowAnyHeader()
+    .AllowCredentials()
     .AllowAnyMethod());
+
 
 app.UseOpenApi();
 app.UseSwaggerUi();

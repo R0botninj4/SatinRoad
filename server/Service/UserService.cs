@@ -42,5 +42,12 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher<User> password
 
         return new UserResponseDto(user.Id, user.Username);
     }
+    public UserResponseDto? GetById(string id)
+    {
+        return db.Users
+            .Where(user => user.Id == id)
+            .Select(user => new UserResponseDto(user.Id, user.Username))
+            .FirstOrDefault();
+    }
 
 }
