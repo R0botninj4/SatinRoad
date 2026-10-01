@@ -7,11 +7,11 @@ RUN bun install --frozen-lockfile
 
 COPY . .
 
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 ENV PORT=3000
 
 USER bun
 
 EXPOSE 3000
 
-CMD ["bun", "src/index.ts"]
+CMD ["bun", "--hot", "src/index.ts"]

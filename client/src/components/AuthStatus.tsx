@@ -1,5 +1,5 @@
 ﻿import { Link } from "react-router-dom";
-import { useAuth } from "../auth/AuthProvider";
+import { useAuth } from "../Auth/AuthProvider";
 import "./AuthStatus.css";
 
 // Small "Log in" / "Log out" strip shown at the top of a page.

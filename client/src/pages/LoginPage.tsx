@@ -1,7 +1,7 @@
 ﻿import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/AuthProvider";
-import { getErrorMessage } from "../auth/apiClient";
+import { useAuth } from "../Auth/AuthProvider";
+import { getErrorMessage } from "../Auth/apiClient";
 import "./LoginPage.css";
 
 type Mode = "login" | "register";

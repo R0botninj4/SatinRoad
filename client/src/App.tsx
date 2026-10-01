@@ -4,7 +4,7 @@ import "./index.css";
 import { ProductListingsPage } from "./pages/ProductListingsPage";
 import { PanoramaBackground } from "./components/PanoramaBackground";
 import { LoginPage } from "./pages/LoginPage";
-import { AuthProvider } from "./auth/AuthProvider";
+import { AuthProvider } from "./Auth/AuthProvider";
 
 const routes: RouteObject[] = [
     { path: "/", element: <MainPage /> },
