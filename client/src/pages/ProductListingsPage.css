@@ -46,7 +46,9 @@
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    background: url("../assets/Sign.png") top left / 128px 64px repeat;
+    background:
+            linear-gradient(rgba(255, 240, 205, 0.28), rgba(255, 240, 205, 0.28)),
+            url("../assets/Sign.png") top left / 128px 64px repeat;
     image-rendering: pixelated;
     border: 3px solid #4a3a22;
     color: #2b1d0e;
