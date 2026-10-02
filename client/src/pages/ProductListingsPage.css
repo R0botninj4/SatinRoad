@@ -46,7 +46,9 @@
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    background: url("../assets/Sign.png") top left / 128px 64px repeat;
+    background:
+            linear-gradient(rgba(255, 240, 205, 0.28), rgba(255, 240, 205, 0.28)),
+            url("../assets/Sign.png") top left / 128px 64px repeat;
     image-rendering: pixelated;
     border: 3px solid #4a3a22;
     color: #2b1d0e;
@@ -80,4 +82,40 @@
     min-width: 100%;
     overflow: hidden;
     white-space: nowrap;
+}
+
+/* Right-align the price and button columns */
+.listings-table th:nth-child(3),
+.listings-table td:nth-child(3),
+.listings-table th:last-child,
+.listings-table td:last-child {
+    text-align: right;
+}
+
+/* Keep the button column as narrow as the button */
+.listings-table th:last-child,
+.listings-table td:last-child {
+    width: 1%;
+    white-space: nowrap;
+}
+
+/* "listings" on the left, Create listing on the right */
+.listings-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: -1.25rem;
+    font-size: 1.1rem;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.listings-toolbar .stone-button {
+    font-size: 1rem;
+}
+
+/* A link that looks like a stone button */
+.listings-toolbar a.stone-button,
+.listings-table a.stone-button {
+    text-decoration: none;
 }

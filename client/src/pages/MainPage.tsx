@@ -11,7 +11,7 @@ export function MainPage() {
 
             <header className="main-page-title">
                 <h1>
-                    <img src={logo} alt="Minecraft Road" className="SatinRoadLogo" />
+                    <img src={logo} alt="Minecraft Road" className="main-page-logo" />
                 </h1>
             </header>
 
