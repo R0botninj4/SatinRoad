@@ -1,0 +1,16 @@
+﻿/* - [ amount ] + */
+.amount-picker {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+.amount-picker .stone-button {
+    min-width: 2.75rem;
+}
+
+.amount-picker-input {
+    width: 5rem;
+    text-align: center;
+}

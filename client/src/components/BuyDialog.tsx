@@ -1,6 +1,7 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import type { Listing } from "../TempData/Mockdata.ts";
-import "./BuyDialog.css";
+import { AmountPicker } from "./AmountPicker";
+import "./Dialog.css";
 
 type BuyDialogProps = {
     listing: Listing;
@@ -8,7 +9,7 @@ type BuyDialogProps = {
     onClose: () => void;
 };
 
-// Pop-up where the buyer picks how many items to buy from one listing.
+// Dialog where the buyer picks how many items to buy from one listing.
 export function BuyDialog({ listing, productName, onClose }: BuyDialogProps) {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [amount, setAmount] = useState(1);
@@ -18,66 +19,32 @@ export function BuyDialog({ listing, productName, onClose }: BuyDialogProps) {
         dialogRef.current?.showModal();
     }, []);
 
-    // Keep the amount between 1 and what the vendor has in stock
-    function changeAmount(value: number) {
-        if (Number.isNaN(value)) return;
-        setAmount(Math.min(Math.max(value, 1), listing.quantity));
-    }
-
     const total = amount * listing.pricePerItem;
 
     return (
         <dialog
             ref={dialogRef}
-            className="buy-dialog"
+            className="sign-dialog"
             aria-labelledby="buy-dialog-title"
             onClose={onClose}
         >
-            <h2 id="buy-dialog-title" className="buy-dialog-title">
+            <h2 id="buy-dialog-title" className="sign-dialog-title">
                 Buy {productName}
             </h2>
 
-            <p className="buy-dialog-details">
-                From {listing.vendor} · {listing.pricePerItem.toFixed(2)} kr each
+            <p className="sign-dialog-text">
+                From {listing.vendor} : {listing.pricePerItem.toFixed(2)} kr each
                 <br />
                 {listing.quantity} in stock
             </p>
 
-            <div className="buy-dialog-amount">
-                <button
-                    type="button"
-                    className="stone-button"
-                    onClick={() => changeAmount(amount - 1)}
-                    disabled={amount <= 1}
-                    aria-label="One less"
-                >
-                    -
-                </button>
+            <AmountPicker value={amount} onChange={setAmount} max={listing.quantity} />
 
-                <input
-                    className="buy-dialog-input"
-                    type="number"
-                    min={1}
-                    max={listing.quantity}
-                    value={amount}
-                    onChange={(event) => changeAmount(event.target.valueAsNumber)}
-                    aria-label="Amount"
-                />
+            <p className="sign-dialog-text">
+                <strong>Total: {total.toFixed(2)} kr</strong>
+            </p>
 
-                <button
-                    type="button"
-                    className="stone-button"
-                    onClick={() => changeAmount(amount + 1)}
-                    disabled={amount >= listing.quantity}
-                    aria-label="One more"
-                >
-                    +
-                </button>
-            </div>
-
-            <p className="buy-dialog-total">Total: {total.toFixed(2)} kr</p>
-
-            <div className="buy-dialog-actions">
+            <div className="sign-dialog-actions">
                 <button type="button" className="stone-button" onClick={() => dialogRef.current?.close()}>
                     Cancel
                 </button>

@@ -98,3 +98,23 @@
     width: 1%;
     white-space: nowrap;
 }
+
+/* "listings" on the left, Create listing on the right */
+.listings-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: -1.25rem;
+    font-size: 1.1rem;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.listings-toolbar .stone-button {
+    font-size: 1rem;
+}
+
+/* A link that looks like a stone button */
+.listings-toolbar a.stone-button {
+    text-decoration: none;
+}

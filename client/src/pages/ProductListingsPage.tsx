@@ -1,14 +1,18 @@
 ﻿import { Fragment, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getListingsForProduct, products, type Listing } from "../TempData/Mockdata.ts";
+import { useAuth } from "../Auth/AuthProvider";
 import { BuyDialog } from "../components/BuyDialog";
+import { SellDialog, type NewListing } from "../components/SellDialog";
 import "./ProductListingsPage.css";
 
 export function ProductListingsPage() {
     const { id } = useParams();
+    const { user } = useAuth();
     const product = products.find((p) => p.id === Number(id));
-    // The listing the user clicked "Buy" on (null = pop-up closed)
+    // The listing the user clicked "Buy" on (null = dialog closed)
     const [buyingListing, setBuyingListing] = useState<Listing | null>(null);
+    const [selling, setSelling] = useState(false);
 
     if (!product) {
         return (
@@ -21,6 +25,11 @@ export function ProductListingsPage() {
 
     const productListings = getListingsForProduct(product.id);
 
+    // TODO: send the new listing to the backend (POST /api/listings)
+    function handleCreateListing(newListing: NewListing) {
+        console.log("Create listing", product?.id, newListing);
+    }
+
     return (
         <section className="listings-page">
             <Link to="/" className="back-link">Go back to main page</Link>
@@ -30,6 +39,22 @@ export function ProductListingsPage() {
                     <img src={product.image} alt="" />
                 </div>
                 <h1>{product.name}</h1>
+            </div>
+
+            <div className="listings-toolbar">
+                <span>
+                    {productListings.length} {productListings.length === 1 ? "listing" : "listings"}
+                </span>
+
+                {user ? (
+                    <button type="button" className="stone-button" onClick={() => setSelling(true)}>
+                        + Create listing
+                    </button>
+                ) : (
+                    <Link to="/login" className="stone-button">
+                        Log in to sell
+                    </Link>
+                )}
             </div>
 
             {productListings.length === 0 ? (
@@ -76,6 +101,14 @@ export function ProductListingsPage() {
                     listing={buyingListing}
                     productName={product.name}
                     onClose={() => setBuyingListing(null)}
+                />
+            )}
+
+            {selling && (
+                <SellDialog
+                    productName={product.name}
+                    onSubmit={handleCreateListing}
+                    onClose={() => setSelling(false)}
                 />
             )}
         </section>

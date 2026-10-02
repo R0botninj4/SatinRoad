@@ -1,29 +1,30 @@
-﻿/* Oak sign pop-up, same look as the listings table */
-.buy-dialog {
+﻿/* Shared look for all oak-sign dialogs (buy, sell, ...) */
+.sign-dialog {
     box-sizing: border-box;
-    width: min(420px, calc(100% - 2rem));
+    width: min(440px, calc(100% - 2rem));
     padding: 1.5rem;
     background:
             linear-gradient(rgba(255, 240, 205, 0.28), rgba(255, 240, 205, 0.28)),
             url("../assets/Sign.png") top left / 128px 64px repeat;
     image-rendering: pixelated;
     border: 3px solid #4a3a22;
-    color: #2b1d0e;
+    color: #1e1206;
+    text-shadow: 1px 1px 0 rgba(255, 236, 190, 0.55);
     text-align: center;
 }
 
-/* Darken the page behind the pop-up */
-.buy-dialog::backdrop {
+/* Darken the page behind the dialog */
+.sign-dialog::backdrop {
     background: rgba(0, 0, 0, 0.6);
 }
 
-.buy-dialog-title {
+.sign-dialog-title {
     margin: 0;
     font-size: 1.3rem;
 }
 
 /* Sign-style divider under the title */
-.buy-dialog-title::after {
+.sign-dialog-title::after {
     content: "------------------------------------------------------------------------------------------------------------------------------------------------------" / "";
     display: block;
     width: 0;
@@ -34,24 +35,25 @@
     font-weight: normal;
 }
 
-.buy-dialog-details {
+.sign-dialog-text {
     margin: 1rem 0;
 }
 
-/* - [ amount ] + */
-.buy-dialog-amount {
+/* Label above a field */
+.sign-dialog-field {
     display: flex;
-    justify-content: center;
-    align-items: stretch;
-    gap: 0.5rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 1rem 0;
 }
 
 /* Minecraft text field, same as the login page */
-.buy-dialog-input {
-    width: 5rem;
+.sign-dialog-input {
     font: inherit;
     text-align: center;
     color: #fff;
+    text-shadow: none;
     background: #000;
     border: 2px solid #a0a0a0;
     border-radius: 0;
@@ -59,16 +61,18 @@
     outline: none;
 }
 
-.buy-dialog-input:focus-visible {
+.sign-dialog-input:focus-visible {
     border-color: #fff;
 }
 
-.buy-dialog-total {
-    margin: 1rem 0;
-    font-weight: 600;
+.sign-dialog-error {
+    margin: 0.5rem 0 0;
+    min-height: 1.5em;
+    color: #8a0000;
+    font-size: 0.9rem;
 }
 
-.buy-dialog-actions {
+.sign-dialog-actions {
     display: flex;
     justify-content: center;
     gap: 1rem;
