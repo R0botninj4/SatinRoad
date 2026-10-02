@@ -81,3 +81,18 @@
     overflow: hidden;
     white-space: nowrap;
 }
+
+/* Right-align the price and button columns */
+.listings-table th:nth-child(3),
+.listings-table td:nth-child(3),
+.listings-table th:last-child,
+.listings-table td:last-child {
+    text-align: right;
+}
+
+/* Keep the button column as narrow as the button */
+.listings-table th:last-child,
+.listings-table td:last-child {
+    width: 1%;
+    white-space: nowrap;
+}

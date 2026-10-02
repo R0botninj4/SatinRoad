@@ -29,6 +29,47 @@ body {
   box-sizing: border-box;
 }
 
+/* Minecraft stone button – shared by the whole site */
+.stone-button {
+  font: inherit;
+  color: #fff;
+  text-shadow: 2px 2px 0 #3f3f3f;
+  background: #6f6f6f;
+  border: 2px solid #000;
+  border-radius: 0;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  box-shadow:
+          inset 2px 2px 0 #a8a8a8,
+          inset -2px -2px 0 #3c3c3c;
+}
+
+.stone-button:hover:not(:disabled) {
+  background: #7d86c4;
+  border-color: #fff;
+}
+
+.stone-button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.stone-button:disabled {
+  color: #a0a0a0;
+  text-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Text only for screen readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* Turn off animations for users who prefer reduced motion */
 @media (prefers-reduced-motion) {
   *,
