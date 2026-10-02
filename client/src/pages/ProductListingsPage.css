@@ -115,6 +115,7 @@
 }
 
 /* A link that looks like a stone button */
-.listings-toolbar a.stone-button {
+.listings-toolbar a.stone-button,
+.listings-table a.stone-button {
     text-decoration: none;
 }

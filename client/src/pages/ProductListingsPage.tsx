@@ -80,14 +80,20 @@ export function ProductListingsPage() {
                                 <td>{listing.quantity}</td>
                                 <td>{listing.pricePerItem.toFixed(2)} kr</td>
                                 <td>
-                                    <button
-                                        type="button"
-                                        className="stone-button"
-                                        onClick={() => setBuyingListing(listing)}
-                                        aria-label={`Buy ${product.name} from ${listing.vendor}`}
-                                    >
-                                        Buy
-                                    </button>
+                                    {user ? (
+                                        <button
+                                            type="button"
+                                            className="stone-button"
+                                            onClick={() => setBuyingListing(listing)}
+                                            aria-label={`Buy ${product.name} from ${listing.vendor}`}
+                                        >
+                                            Buy
+                                        </button>
+                                    ) : (
+                                        <Link to="/login" className="stone-button">
+                                            Log in to buy
+                                        </Link>
+                                    )}
                                 </td>
                             </tr>
                         </Fragment>
