@@ -1,20 +1,120 @@
-﻿import { Fragment, useState } from "react";
+﻿import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getListingsForProduct, products, type Listing } from "../TempData/Mockdata.ts";
+import { api } from "../Auth/apiClient";
 import { useAuth } from "../Auth/AuthProvider";
+import type { Item, Listing as ApiListing } from "../api/Api";
 import { BuyDialog } from "../components/BuyDialog";
 import { SellDialog, type NewListing } from "../components/SellDialog";
 import "./ProductListingsPage.css";
 
+import blazeRodImage from "../assets/product-images/Blaze-rod.png";
+import wheatImage from "../assets/product-images/Wheat.png";
+import sugarImage from "../assets/product-images/Sugar.png";
+import sugarCaneImage from "../assets/product-images/Sugar-cane.png";
+import tntImage from "../assets/product-images/TNT.png";
+import seedsImage from "../assets/product-images/Seeds.png";
+
+const itemImages: Record<number, string> = {
+    1: blazeRodImage,
+    2: wheatImage,
+    3: sugarImage,
+    4: sugarCaneImage,
+    5: tntImage,
+    6: seedsImage,
+};
+
 export function ProductListingsPage() {
     const { id } = useParams();
     const { user } = useAuth();
-    const product = products.find((p) => p.id === Number(id));
-    // The listing the user clicked "Buy" on (null = dialog closed)
-    const [buyingListing, setBuyingListing] = useState<Listing | null>(null);
-    const [selling, setSelling] = useState(false);
+    const itemId = Number(id);
 
-    if (!product) {
+    const [item, setItem] = useState<Item | null>(null);
+    const [listings, setListings] = useState<ApiListing[]>([]);
+    const [buyingListing, setBuyingListing] = useState<ApiListing | null>(null);
+    const [selling, setSelling] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        async function loadData() {
+            try {
+                const [items, allListings] = await Promise.all([
+                    api.api.itemGetAll(),
+                    api.api.listingGetAll(),
+                ]);
+
+                const selectedItem = items.find(
+                    (currentItem) => currentItem.id === itemId,
+                );
+
+                setItem(selectedItem ?? null);
+
+                const selectedListings = allListings
+                    .filter((listing) => listing.itemId === itemId)
+                    .sort(
+                        (first, second) =>
+                            (first.price ?? 0) - (second.price ?? 0),
+                    );
+
+                setListings(selectedListings);
+            } catch {
+                setError("Could not load listings.");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadData();
+    }, [itemId]);
+
+    function openBuyDialog(listing: ApiListing) {
+        setBuyingListing(listing);
+    }
+
+    async function handleCreateListing(newListing: NewListing) {
+        try {
+            await api.api.listingCreate({
+                itemId,
+                price: newListing.pricePerItem,
+                quantity: newListing.amount,
+                description: "",
+            });
+
+            const allListings = await api.api.listingGetAll();
+
+            setListings(
+                allListings
+                    .filter((listing) => listing.itemId === itemId)
+                    .sort(
+                        (first, second) =>
+                            (first.price ?? 0) - (second.price ?? 0),
+                    ),
+            );
+
+            setSelling(false);
+        } catch {
+            setError("Could not create listing.");
+        }
+    }
+
+    if (loading) {
+        return (
+            <section className="listings-page">
+                <p>Loading listings...</p>
+            </section>
+        );
+    }
+
+    if (error) {
+        return (
+            <section className="listings-page">
+                <p>{error}</p>
+                <Link to="/">Back to main page</Link>
+            </section>
+        );
+    }
+
+    if (!item) {
         return (
             <section className="listings-page">
                 <p>Product not found.</p>
@@ -23,31 +123,35 @@ export function ProductListingsPage() {
         );
     }
 
-    const productListings = getListingsForProduct(product.id);
-
-    // TODO: send the new listing to the backend (POST /api/listings)
-    function handleCreateListing(newListing: NewListing) {
-        console.log("Create listing", product?.id, newListing);
-    }
-
     return (
         <section className="listings-page">
-            <Link to="/" className="back-link">Go back to main page</Link>
+            <Link to="/" className="back-link">
+                Go back to main page
+            </Link>
 
             <div className="listings-product">
                 <div className="listings-product-image">
-                    <img src={product.image} alt="" />
+                    <img
+                        src={itemImages[item.id ?? 0]}
+                        alt={item.name}
+                    />
                 </div>
-                <h1>{product.name}</h1>
+
+                <h1>{item.name}</h1>
             </div>
 
             <div className="listings-toolbar">
                 <span>
-                    {productListings.length} {productListings.length === 1 ? "listing" : "listings"}
+                    {listings.length}{" "}
+                    {listings.length === 1 ? "listing" : "listings"}
                 </span>
 
                 {user ? (
-                    <button type="button" className="stone-button" onClick={() => setSelling(true)}>
+                    <button
+                        type="button"
+                        className="stone-button"
+                        onClick={() => setSelling(true)}
+                    >
                         + Create listing
                     </button>
                 ) : (
@@ -57,7 +161,7 @@ export function ProductListingsPage() {
                 )}
             </div>
 
-            {productListings.length === 0 ? (
+            {listings.length === 0 ? (
                 <p>No one is selling this product right now.</p>
             ) : (
                 <table className="listings-table">
@@ -66,31 +170,51 @@ export function ProductListingsPage() {
                         <th>Vendor</th>
                         <th>Amount</th>
                         <th>Price per item</th>
-                        <th><span className="visually-hidden">Actions</span></th>
+                        <th>
+                                <span className="visually-hidden">
+                                    Actions
+                                </span>
+                        </th>
                     </tr>
                     </thead>
+
                     <tbody>
-                    {productListings.map((listing) => (
+                    {listings.map((listing) => (
                         <Fragment key={listing.id}>
-                            <tr className="sign-divider" aria-hidden="true">
+                            <tr
+                                className="sign-divider"
+                                aria-hidden="true"
+                            >
                                 <td colSpan={4} />
                             </tr>
+
                             <tr>
-                                <td>{listing.vendor}</td>
-                                <td>{listing.quantity}</td>
-                                <td>{listing.pricePerItem.toFixed(2)} kr</td>
+                                <td>
+                                    {listing.username ?? "Unknown vendor"}
+                                </td>
+
+                                <td>{listing.quantity ?? 0}</td>
+
+                                <td>
+                                    {(listing.price ?? 0).toFixed(2)} kr
+                                </td>
+
                                 <td>
                                     {user ? (
                                         <button
                                             type="button"
                                             className="stone-button"
-                                            onClick={() => setBuyingListing(listing)}
-                                            aria-label={`Buy ${product.name} from ${listing.vendor}`}
+                                            onClick={() =>
+                                                openBuyDialog(listing)
+                                            }
                                         >
                                             Buy
                                         </button>
                                     ) : (
-                                        <Link to="/login" className="stone-button">
+                                        <Link
+                                            to="/login"
+                                            className="stone-button"
+                                        >
                                             Log in to buy
                                         </Link>
                                     )}
@@ -105,14 +229,28 @@ export function ProductListingsPage() {
             {buyingListing && (
                 <BuyDialog
                     listing={buyingListing}
-                    productName={product.name}
+                    productName={item.name ?? ""}
                     onClose={() => setBuyingListing(null)}
+                    onBought={async () => {
+                        const allListings = await api.api.listingGetAll();
+
+                        setListings(
+                            allListings
+                                .filter((listing) => listing.itemId === itemId)
+                                .sort(
+                                    (first, second) =>
+                                        (first.price ?? 0) - (second.price ?? 0),
+                                ),
+                        );
+
+                        setBuyingListing(null);
+                    }}
                 />
             )}
 
             {selling && (
                 <SellDialog
-                    productName={product.name}
+                    productName={item.name ?? ""}
                     onSubmit={handleCreateListing}
                     onClose={() => setSelling(false)}
                 />

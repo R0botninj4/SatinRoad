@@ -6,10 +6,31 @@ namespace Service;
 
 public class ListingService(MyDatabaseConnection db)
 {
-    public List<Listing> GetAll()
+    public List<ListingResponseDto> GetAll()
     {
-        return db.Listings
+        var listings = db.Listings
             .OrderBy(listing => listing.Id)
+            .ToList();
+
+        return listings
+            .Select(listing =>
+            {
+                var username = db.Users
+                    .Where(user => user.Id == listing.UserId)
+                    .Select(user => user.Username)
+                    .FirstOrDefault();
+
+                return new ListingResponseDto
+                {
+                    Id = listing.Id,
+                    UserId = listing.UserId,
+                    Username = username ?? "Unknown vendor",
+                    ItemId = listing.ItemId,
+                    Price = listing.Price,
+                    Quantity = listing.Quantity,
+                    Description = listing.Description
+                };
+            })
             .ToList();
     }
 

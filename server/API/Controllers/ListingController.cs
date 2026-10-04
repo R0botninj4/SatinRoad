@@ -13,8 +13,8 @@ public class ListingController(ListingService listingService)
     : ControllerBase
 {
     [HttpGet]
-    [ProducesResponseType(typeof(List<Listing>), StatusCodes.Status200OK)]
-    public List<Listing> GetAll()
+    [ProducesResponseType(typeof(List<ListingResponseDto>), StatusCodes.Status200OK)]
+    public List<ListingResponseDto> GetAll()
     {
         return listingService.GetAll();
     }
