@@ -23,10 +23,7 @@ public class OrderService(MyDatabaseConnection db)
             throw new ValidationException("Listing does not exist.");
         }
 
-        if (listing.Quantity < dto.Quantity)
-        {
-            throw new ValidationException("Not enough items in stock.");
-        }
+        var remainingStock = OrderHelpers.CalculateRemainingStock(listing.Quantity, dto.Quantity);
 
         var order = new Order
         {
@@ -34,11 +31,11 @@ public class OrderService(MyDatabaseConnection db)
             BuyerId = buyerId,
             ListingId = dto.ListingId,
             Quantity = dto.Quantity,
-            TotalPrice = listing.Price * dto.Quantity,
+            TotalPrice = OrderHelpers.CalculateTotalPrice(listing.Price, dto.Quantity),
             CreatedAt = DateTime.UtcNow
         };
 
-        listing.Quantity -= dto.Quantity;
+        listing.Quantity = remainingStock;
 
         db.Insert(order);
         db.Update(listing);

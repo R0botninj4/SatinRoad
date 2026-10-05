@@ -76,7 +76,33 @@ The existing category and item endpoints keep their current public access.
 
 Validation used a separate temporary SQLite database: registration, duplicate
 usernames, invalid input, successful login and incorrect passwords.
-Unit tests are deferred to the planned Test Last phase.
+Registration input validation is covered by the unit tests described below.
+
+## Unit tests
+
+We use **Test Last**: write the feature first, then write tests for its logic.
+The tests use xUnit with `[Fact]`, `[Theory]` and Arrange–Act–Assert, following
+the same style as our earlier SuperChocolateMilk tests.
+
+Run the tests from the repository root:
+
+```powershell
+dotnet test SatinRoad.slnx
+```
+
+- `OrderHelpersTests`: total price, decimal prices, remaining stock,
+  buying the last item and rejecting purchases with insufficient stock.
+- `RequestValidationTests`: quantities, listing IDs, product IDs, prices
+  and username/password lengths.
+
+The price and stock calculations are extracted into `OrderHelpers` and used
+by `OrderService`. Tests call these methods directly, without a database or mocks.
+We test normal cases, invalid input and boundaries rather than aiming for 100% coverage.
+After changing a feature, update its tests and run them before merging.
+GitHub Actions also runs them on pull requests and pushes to main/master.
+
+These are focused unit tests; database, login flows and browser behavior are
+not covered by this suite.
 
 ## Earlier setup validation
 
@@ -90,7 +116,7 @@ Unit tests are deferred to the planned Test Last phase.
 
 ## Remaining work
 
-Product features, automated tests, testing methodology documentation
-and Lighthouse sustainability measurements are not implemented yet.
+Category administration, editing/restocking/removing listings, bonus features
+and Lighthouse sustainability measurements still need work.
 
 The current Docker setup is intended for running locally.
