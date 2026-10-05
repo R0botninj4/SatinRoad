@@ -14,7 +14,7 @@ import tntImage from "../assets/product-images/TNT.png";
 import seedsImage from "../assets/product-images/Seeds.png";
 import ironSwordImage from "../assets/product-images/Iron-sword.png";
 import goldHelmetImage from "../assets/product-images/Golden-helmet.png";
-import stick from "../assets/product-images/Stick.gif";
+import stick from "../assets/product-images/Stick.webp";
 
 const itemImages: Record<number, string> = {
     1: blazeRodImage,
