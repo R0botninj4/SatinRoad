@@ -68,6 +68,19 @@ export interface Item {
   name?: string;
 }
 
+export interface ListingResponseDto {
+  id?: string;
+  userId?: string;
+  username?: string;
+  /** @format int32 */
+  itemId?: number;
+  /** @format decimal */
+  price?: number;
+  /** @format int32 */
+  quantity?: number;
+  description?: string;
+}
+
 export interface Listing {
   id?: string;
   userId?: string;
@@ -531,7 +544,7 @@ export class Api<
      * @request GET:/api/listings
      */
     listingGetAll: (params: RequestParams = {}) =>
-      this.request<Listing[], any>({
+      this.request<ListingResponseDto[], any>({
         path: `/api/listings`,
         method: "GET",
         format: "json",
