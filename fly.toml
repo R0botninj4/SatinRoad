@@ -1,4 +1,4 @@
-app = "satinroad" 
+app = "satinroad"
 primary_region = "arn"
 
 [build]
