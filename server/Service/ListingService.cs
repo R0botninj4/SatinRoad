@@ -64,4 +64,13 @@ public class ListingService(MyDatabaseConnection db)
 
         return listing;
     }
+
+    public bool Delete(string userId, string listingId)
+    {
+        var deletedRows = db.Listings
+            .Where(listing => listing.Id == listingId && listing.UserId == userId)
+            .Delete();
+
+        return deletedRows > 0;
+    }
 }

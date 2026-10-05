@@ -14,6 +14,9 @@ public class Order
     public string ListingId { get; set; } = "";
 
     [Column]
+    public int ItemId { get; set; }
+
+    [Column]
     public int Quantity { get; set; }
 
     [Column]

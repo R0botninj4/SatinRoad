@@ -66,6 +66,21 @@ using (var scope = app.Services.CreateScope())
     db.CreateTable<Order>(
         tableOptions: TableOptions.CreateIfNotExists);
 
+    // Upgrade databases created before orders stored their product.
+    var hasItemId = db.Execute<int>(
+        "SELECT COUNT(*) FROM pragma_table_info('Order') WHERE name = 'ItemId'");
+    if (hasItemId == 0)
+    {
+        db.Execute("ALTER TABLE [Order] ADD COLUMN ItemId INTEGER NOT NULL DEFAULT 0");
+    }
+
+    // Preserve product information for older orders while their listings exist.
+    db.Execute("""
+        UPDATE [Order]
+        SET ItemId = (SELECT ItemId FROM Listing WHERE Listing.Id = [Order].ListingId)
+        WHERE ItemId = 0 AND EXISTS (SELECT 1 FROM Listing WHERE Listing.Id = [Order].ListingId)
+        """);
+
     var items = new List<Item>
     {
         new() { Id = 1, Name = "Blaze rod" },

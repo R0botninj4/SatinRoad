@@ -30,6 +30,7 @@ public class OrderService(MyDatabaseConnection db)
             Id = Guid.NewGuid().ToString(),
             BuyerId = buyerId,
             ListingId = dto.ListingId,
+            ItemId = listing.ItemId,
             Quantity = dto.Quantity,
             TotalPrice = OrderHelpers.CalculateTotalPrice(listing.Price, dto.Quantity),
             CreatedAt = DateTime.UtcNow
@@ -38,7 +39,14 @@ public class OrderService(MyDatabaseConnection db)
         listing.Quantity = remainingStock;
 
         db.Insert(order);
-        db.Update(listing);
+        if (listing.Quantity == 0)
+        {
+            db.Delete(listing);
+        }
+        else
+        {
+            db.Update(listing);
+        }
 
         return order;
     }

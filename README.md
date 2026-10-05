@@ -116,7 +116,7 @@ not covered by this suite.
 
 ## Remaining work
 
-Category administration, editing/restocking/removing listings, bonus features
+Category administration, editing/restocking listings, bonus features
 and Lighthouse sustainability measurements still need work.
 
 The current Docker setup is intended for running locally.

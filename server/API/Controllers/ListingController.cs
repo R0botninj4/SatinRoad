@@ -42,4 +42,20 @@ public class ListingController(ListingService listingService)
             return BadRequest(exception.Message);
         }
     }
+
+    [HttpDelete("{id}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult Delete(string id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        return listingService.Delete(userId, id) ? NoContent() : NotFound();
+    }
 }
