@@ -17,9 +17,4 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - run: dotnet restore SatinRoad.slnx
-      - run: dotnet test SatinRoad.slnx --no-restore --configuration Release --collect:"XPlat Code Coverage" --results-directory TestResults
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: backend-test-results
-          path: TestResults/
+      - run: dotnet test SatinRoad.slnx --no-restore --configuration Release

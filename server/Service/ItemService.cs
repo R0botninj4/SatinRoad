@@ -1,8 +1,8 @@
-using Infra;
+﻿using Infra;
 
 namespace Service;
 
-public class ItemService(IApplicationData db)
+public class ItemService(MyDatabaseConnection db)
 {
     public List<Item> GetAll()
     {

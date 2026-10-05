@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Infra;
+using LinqToDB;
 using Microsoft.AspNetCore.Identity;
 
 namespace Service;
 
-public class UserService(IApplicationData db, IPasswordHasher<User> passwordHasher)
+public class UserService(MyDatabaseConnection db, IPasswordHasher<User> passwordHasher)
 {
     public UserResponseDto? Register(RegisterRequestDto dto)
     {

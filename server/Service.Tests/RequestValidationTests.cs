@@ -1,24 +1,40 @@
 using System.ComponentModel.DataAnnotations;
+using Xunit;
 
 namespace Service.Tests;
 
-// ASP.NET validates these annotations before invoking controller actions.
-// Service tests alone do not exercise that boundary.
 public class RequestValidationTests
 {
-    private static bool IsValid(object request) => Validator.TryValidateObject(
-        request, new ValidationContext(request), new List<ValidationResult>(), validateAllProperties: true);
-
     [Theory]
     [InlineData(0, false)]
     [InlineData(-1, false)]
     [InlineData(1, true)]
-    public void Purchase_quantity_must_be_positive(int quantity, bool valid) =>
-        Assert.Equal(valid, IsValid(new CreateOrderRequestDto { ListingId = "listing", Quantity = quantity }));
+    public void OrderQuantity_VariousAmounts_ReturnsExpectedValidation(int quantity, bool expected)
+    {
+        // Arrange
+        var request = new CreateOrderRequestDto { ListingId = "listing", Quantity = quantity };
+        var errors = new List<ValidationResult>();
+
+        // Act
+        bool result = Validator.TryValidateObject(request, new ValidationContext(request), errors, true);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
 
     [Fact]
-    public void Purchase_requires_listing_id() =>
-        Assert.False(IsValid(new CreateOrderRequestDto { ListingId = "", Quantity = 1 }));
+    public void OrderListingId_EmptyId_IsInvalid()
+    {
+        // Arrange
+        var request = new CreateOrderRequestDto { ListingId = "", Quantity = 1 };
+        var errors = new List<ValidationResult>();
+
+        // Act
+        bool result = Validator.TryValidateObject(request, new ValidationContext(request), errors, true);
+
+        // Assert
+        Assert.False(result);
+    }
 
     [Theory]
     [InlineData(0, 1, 1, false)]
@@ -27,13 +43,35 @@ public class RequestValidationTests
     [InlineData(1, 1, 0, false)]
     [InlineData(1, 1, -1, false)]
     [InlineData(1, 0.01, 1, true)]
-    public void Listing_requires_item_positive_price_and_positive_stock(int itemId, double price, int quantity, bool valid) =>
-        Assert.Equal(valid, IsValid(new CreateListingRequestDto { ItemId = itemId, Price = (decimal)price, Quantity = quantity }));
+    public void Listing_VariousInputs_ReturnsExpectedValidation(
+        int itemId, decimal price, int quantity, bool expected)
+    {
+        // Arrange
+        var request = new CreateListingRequestDto { ItemId = itemId, Price = price, Quantity = quantity };
+        var errors = new List<ValidationResult>();
+
+        // Act
+        bool result = Validator.TryValidateObject(request, new ValidationContext(request), errors, true);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
 
     [Theory]
     [InlineData("ab", "CorrectPassword123!", false)]
     [InlineData("Alice", "short", false)]
     [InlineData("Alice", "CorrectPassword123!", true)]
-    public void Registration_requires_valid_username_and_password_length(string username, string password, bool valid) =>
-        Assert.Equal(valid, IsValid(new RegisterRequestDto { Username = username, Password = password }));
+    public void Registration_VariousInputs_ReturnsExpectedValidation(
+        string username, string password, bool expected)
+    {
+        // Arrange
+        var request = new RegisterRequestDto { Username = username, Password = password };
+        var errors = new List<ValidationResult>();
+
+        // Act
+        bool result = Validator.TryValidateObject(request, new ValidationContext(request), errors, true);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
 }

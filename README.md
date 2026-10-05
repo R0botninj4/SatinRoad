@@ -76,66 +76,33 @@ The existing category and item endpoints keep their current public access.
 
 Validation used a separate temporary SQLite database: registration, duplicate
 usernames, invalid input, successful login and incorrect passwords.
-Service-level account behavior is covered by the unit test suite described below.
+Registration input validation is covered by the unit tests described below.
 
-## Automated tests and quality assurance
+## Unit tests
 
-We use **Test Last**: the application features were implemented first, then
-automated tests were added against the existing requirements. For each feature
-we identify successful behavior, rejection cases and important boundaries,
-arrange the required data, perform the action, and assert both the response and
-the resulting database state (Arrange–Act–Assert). Run the suite after changes
-and before merging a pull request; add regression tests when fixing bugs.
+We use **Test Last**: write the feature first, then write tests for its logic.
+The tests use xUnit with `[Fact]`, `[Theory]` and Arrange–Act–Assert, following
+the same style as our earlier SuperChocolateMilk tests.
 
-The xUnit project `server/Service.Tests` contains unit tests for all five
-backend services. Each test uses a fresh `FakeApplicationData` with in-memory
-collections through the `IApplicationData` interface. Account tests also use
-`FakePasswordHasher` to control password verification and check when hashing
-is requested. No database, files, network, web server or real password hashing
-is used by the tests.
-
-Production still uses `MyDatabaseConnection` with Linq2db; dependency injection
-provides it through `IApplicationData`. The fake copies entities when reading
-and writing so tests can distinguish an explicit update from a change to a
-returned object. The tests verify service decisions, calculated values and
-calls to dependencies. They do not verify SQL queries or database persistence.
-
-Separate tests exercise the DTO validation annotations used by ASP.NET Core.
-This distinction matters: services do not automatically execute those annotations.
-
-Run from the repository root with the .NET 10 SDK (no running app or Docker needed):
+Run the tests from the repository root:
 
 ```powershell
-dotnet test SatinRoad.slnx --configuration Release
+dotnet test SatinRoad.slnx
 ```
 
-To also collect coverage:
+- `OrderHelpersTests`: total price, decimal prices, remaining stock,
+  buying the last item and rejecting purchases with insufficient stock.
+- `RequestValidationTests`: quantities, listing IDs, product IDs, prices
+  and username/password lengths.
 
-```powershell
-dotnet test SatinRoad.slnx --configuration Release --collect:"XPlat Code Coverage" --results-directory TestResults
-```
+The price and stock calculations are extracted into `OrderHelpers` and used
+by `OrderService`. Tests call these methods directly, without a database or mocks.
+We test normal cases, invalid input and boundaries rather than aiming for 100% coverage.
+After changing a feature, update its tests and run them before merging.
+GitHub Actions also runs them on pull requests and pushes to main/master.
 
-The collector writes a `coverage.cobertura.xml` under `TestResults`.
-Coverage helps identify untested behavior; 100% coverage is not the goal.
-We prioritize logic that can affect stock, order totals, account access and buyer-specific results.
-
-| Area | Automated scenarios |
-| --- | --- |
-| Orders | Exact decimal totals, order data passed to the fake, partial purchases, buying the last stock, insufficient stock, missing buyer/listing, sold-out purchases, buyer-specific history sorted newest first |
-| Listings | Owner/product/price/stock passed to the fake, trimmed description, missing user/product rejection, vendor display name and fallback |
-| Accounts | Delegating password hashing and verification, case-insensitive duplicate rejection and login, failed verification, unknown user, user lookup, requesting a hash upgrade |
-| Categories and products | Trimmed category names, blank-name rejection, lookup, product ordering and empty catalog |
-| Request validation | Nonpositive quantities/prices, missing listing/product IDs, minimum price, username and password length |
-
-GitHub Actions (`.github/workflows/backend-tests.yml`) runs the Release test
-suite on pull requests and pushes to `main`/`master`, and uploads coverage
-results as a workflow artifact. The local suite is also run before submitting
-the test changes for review.
-
-Scope: this suite contains only unit tests. Database mappings, SQL translation,
-database constraints, cryptographic hashing, HTTP middleware, cookie authorization,
-React/browser behavior, concurrent purchases and transaction rollback are outside
-its scope. Passing these tests does not demonstrate production readiness.
+These are focused unit tests; database, login flows and browser behavior are
+not covered by this suite.
 
 ## Earlier setup validation
 
