@@ -9,4 +9,7 @@ public class Item
 
     [Column]
     public string Name { get; set; } = "";
+
+    [Column]
+    public string? CategoryId { get; set; }
 }
