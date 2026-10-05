@@ -66,6 +66,7 @@ export interface Item {
   /** @format int32 */
   id?: number;
   name?: string;
+  categoryId?: string | null;
 }
 
 export interface ListingResponseDto {

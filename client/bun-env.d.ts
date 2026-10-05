@@ -21,6 +21,11 @@ declare module "*.gif" {
   export = path;
 }
 
+declare module "*.webp" {
+  const path: `${string}.webp`;
+  export = path;
+}
+
 declare module "*.css" {}
 
 declare module "*.module.css" {

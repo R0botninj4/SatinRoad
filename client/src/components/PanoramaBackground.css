@@ -35,11 +35,12 @@
     background-size: cover;
 }
 
-/* Each face is pushed out to a wall of the cube, facing inwards */
-.panorama-front { background-image: url("../assets/panorama/front.webp"); transform: translateZ(calc(var(--half) * -1)); }
-.panorama-right { background-image: url("../assets/panorama/right.webp"); transform: rotateY(-90deg) translateZ(calc(var(--half) * -1)); }
-.panorama-back  { background-image: url("../assets/panorama/back.webp");  transform: rotateY(-180deg) translateZ(calc(var(--half) * -1)); }
-.panorama-left  { background-image: url("../assets/panorama/left.webp");  transform: rotateY(-270deg) translateZ(calc(var(--half) * -1)); }
+/* Each face is pushed out to a wall of the cube, facing inwards.
+   The images are set in PanoramaBackground.tsx. */
+.panorama-front { transform: translateZ(calc(var(--half) * -1)); }
+.panorama-right { transform: rotateY(-90deg) translateZ(calc(var(--half) * -1)); }
+.panorama-back  { transform: rotateY(-180deg) translateZ(calc(var(--half) * -1)); }
+.panorama-left  { transform: rotateY(-270deg) translateZ(calc(var(--half) * -1)); }
 
 /* Move the cube's centre to the camera, then turn it */
 @keyframes panorama-spin {
