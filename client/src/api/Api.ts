@@ -119,6 +119,8 @@ export interface Order {
   buyerId?: string;
   listingId?: string;
   /** @format int32 */
+  itemId?: number;
+  /** @format int32 */
   quantity?: number;
   /** @format decimal */
   totalPrice?: number;
@@ -138,6 +140,10 @@ export interface CreateOrderRequestDto {
 }
 
 export interface CategoryGetByIdParams {
+  id: string;
+}
+
+export interface ListingDeleteParams {
   id: string;
 }
 
@@ -568,6 +574,20 @@ export class Api<
         body: data,
         type: ContentType.Json,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Listing
+     * @name ListingDelete
+     * @request DELETE:/api/listings/{id}
+     */
+    listingDelete: ({ id }: ListingDeleteParams, params: RequestParams = {}) =>
+      this.request<void, ProblemDetails>({
+        path: `/api/listings/${id}`,
+        method: "DELETE",
         ...params,
       }),
 
