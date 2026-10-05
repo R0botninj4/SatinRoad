@@ -12,6 +12,9 @@ import sugarImage from "../assets/product-images/Sugar.png";
 import sugarCaneImage from "../assets/product-images/Sugar-cane.png";
 import tntImage from "../assets/product-images/TNT.png";
 import seedsImage from "../assets/product-images/Seeds.png";
+import ironSwordImage from "../assets/product-images/Iron-sword.png";
+import goldHelmetImage from "../assets/product-images/Golden-helmet.png";
+import stick from "../assets/product-images/Stick.gif";
 
 const itemImages: Record<number, string> = {
     1: blazeRodImage,
@@ -20,6 +23,9 @@ const itemImages: Record<number, string> = {
     4: sugarCaneImage,
     5: tntImage,
     6: seedsImage,
+    7: ironSwordImage,
+    8: goldHelmetImage,
+    9: stick,
 };
 
 export function MainPage() {
