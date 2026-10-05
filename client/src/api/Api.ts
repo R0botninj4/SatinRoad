@@ -119,6 +119,8 @@ export interface Order {
   buyerId?: string;
   listingId?: string;
   /** @format int32 */
+  itemId?: number;
+  /** @format int32 */
   quantity?: number;
   /** @format decimal */
   totalPrice?: number;
@@ -138,6 +140,10 @@ export interface CreateOrderRequestDto {
 }
 
 export interface CategoryGetByIdParams {
+  id: string;
+}
+
+export interface ListingDeleteParams {
   id: string;
 }
 
@@ -164,21 +170,21 @@ export interface FullRequestParams extends Omit<RequestInit, "body"> {
 }
 
 export type RequestParams = Omit<
-  FullRequestParams,
-  "body" | "method" | "query" | "path"
+    FullRequestParams,
+    "body" | "method" | "query" | "path"
 >;
 
 export interface ApiConfig<SecurityDataType = unknown> {
   baseUrl?: string;
   baseApiParams?: Omit<RequestParams, "baseUrl" | "cancelToken" | "signal">;
   securityWorker?: (
-    securityData: SecurityDataType | null,
+      securityData: SecurityDataType | null,
   ) => Promise<RequestParams | void> | RequestParams | void;
   customFetch?: typeof fetch;
 }
 
 export interface HttpResponse<D extends unknown, E extends unknown = unknown>
-  extends Response {
+    extends Response {
   data: D;
   error: E;
 }
@@ -199,7 +205,7 @@ export class HttpClient<SecurityDataType = unknown> {
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
   private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
-    fetch(...fetchParams);
+      fetch(...fetchParams);
 
   private baseApiParams: RequestParams = {
     credentials: "same-origin",
@@ -233,15 +239,15 @@ export class HttpClient<SecurityDataType = unknown> {
   protected toQueryString(rawQuery?: QueryParamsType): string {
     const query = rawQuery || {};
     const keys = Object.keys(query).filter(
-      (key) => "undefined" !== typeof query[key],
+        (key) => "undefined" !== typeof query[key],
     );
     return keys
-      .map((key) =>
-        Array.isArray(query[key])
-          ? this.addArrayQueryParam(query, key)
-          : this.addQueryParam(query, key),
-      )
-      .join("&");
+        .map((key) =>
+            Array.isArray(query[key])
+                ? this.addArrayQueryParam(query, key)
+                : this.addQueryParam(query, key),
+        )
+        .join("&");
   }
 
   protected addQueryParams(rawQuery?: QueryParamsType): string {
@@ -251,17 +257,17 @@ export class HttpClient<SecurityDataType = unknown> {
 
   private contentFormatters: Record<ContentType, (input: any) => any> = {
     [ContentType.Json]: (input: any) =>
-      input !== null && (typeof input === "object" || typeof input === "string")
-        ? JSON.stringify(input)
-        : input,
+        input !== null && (typeof input === "object" || typeof input === "string")
+            ? JSON.stringify(input)
+            : input,
     [ContentType.JsonApi]: (input: any) =>
-      input !== null && (typeof input === "object" || typeof input === "string")
-        ? JSON.stringify(input)
-        : input,
+        input !== null && (typeof input === "object" || typeof input === "string")
+            ? JSON.stringify(input)
+            : input,
     [ContentType.Text]: (input: any) =>
-      input !== null && typeof input !== "string"
-        ? JSON.stringify(input)
-        : input,
+        input !== null && typeof input !== "string"
+            ? JSON.stringify(input)
+            : input,
     [ContentType.FormData]: (input: any) => {
       if (input instanceof FormData) {
         return input;
@@ -270,12 +276,12 @@ export class HttpClient<SecurityDataType = unknown> {
       return Object.keys(input || {}).reduce((formData, key) => {
         const property = input[key];
         formData.append(
-          key,
-          property instanceof Blob
-            ? property
-            : typeof property === "object" && property !== null
-              ? JSON.stringify(property)
-              : `${property}`,
+            key,
+            property instanceof Blob
+                ? property
+                : typeof property === "object" && property !== null
+                    ? JSON.stringify(property)
+                    : `${property}`,
         );
         return formData;
       }, new FormData());
@@ -284,8 +290,8 @@ export class HttpClient<SecurityDataType = unknown> {
   };
 
   protected mergeRequestParams(
-    params1: RequestParams,
-    params2?: RequestParams,
+      params1: RequestParams,
+      params2?: RequestParams,
   ): RequestParams {
     return {
       ...this.baseApiParams,
@@ -300,7 +306,7 @@ export class HttpClient<SecurityDataType = unknown> {
   }
 
   protected createAbortSignal = (
-    cancelToken: CancelToken,
+      cancelToken: CancelToken,
   ): AbortSignal | undefined => {
     if (this.abortControllers.has(cancelToken)) {
       const abortController = this.abortControllers.get(cancelToken);
@@ -325,45 +331,45 @@ export class HttpClient<SecurityDataType = unknown> {
   };
 
   public request = async <T = any, E = any>({
-    body,
-    secure,
-    path,
-    type,
-    query,
-    format,
-    baseUrl,
-    cancelToken,
-    ...params
-  }: FullRequestParams): Promise<T> => {
+                                              body,
+                                              secure,
+                                              path,
+                                              type,
+                                              query,
+                                              format,
+                                              baseUrl,
+                                              cancelToken,
+                                              ...params
+                                            }: FullRequestParams): Promise<T> => {
     const secureParams =
-      ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
-        this.securityWorker &&
-        (await this.securityWorker(this.securityData))) ||
-      {};
+        ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
+            this.securityWorker &&
+            (await this.securityWorker(this.securityData))) ||
+        {};
     const requestParams = this.mergeRequestParams(params, secureParams);
     const queryString = query && this.toQueryString(query);
     const payloadFormatter = this.contentFormatters[type || ContentType.Json];
     const responseFormat = format || requestParams.format;
 
     return this.customFetch(
-      `${baseUrl || this.baseUrl || ""}${path}${queryString ? `?${queryString}` : ""}`,
-      {
-        ...requestParams,
-        headers: {
-          ...(requestParams.headers || {}),
-          ...(type && type !== ContentType.FormData
-            ? { "Content-Type": type }
-            : {}),
+        `${baseUrl || this.baseUrl || ""}${path}${queryString ? `?${queryString}` : ""}`,
+        {
+          ...requestParams,
+          headers: {
+            ...(requestParams.headers || {}),
+            ...(type && type !== ContentType.FormData
+                ? { "Content-Type": type }
+                : {}),
+          },
+          signal:
+              (cancelToken
+                  ? this.createAbortSignal(cancelToken)
+                  : requestParams.signal) || null,
+          body:
+              typeof body === "undefined" || body === null
+                  ? null
+                  : payloadFormatter(body),
         },
-        signal:
-          (cancelToken
-            ? this.createAbortSignal(cancelToken)
-            : requestParams.signal) || null,
-        body:
-          typeof body === "undefined" || body === null
-            ? null
-            : payloadFormatter(body),
-      },
     ).then(async (response) => {
       const r = response as HttpResponse<T, E>;
       r.data = null as unknown as T;
@@ -371,20 +377,20 @@ export class HttpClient<SecurityDataType = unknown> {
 
       const responseToParse = responseFormat ? response.clone() : response;
       const data = !responseFormat
-        ? r
-        : await responseToParse[responseFormat]()
-            .then((data) => {
-              if (r.ok) {
-                r.data = data;
-              } else {
-                r.error = data;
-              }
-              return r;
-            })
-            .catch((e) => {
-              r.error = e;
-              return r;
-            });
+          ? r
+          : await responseToParse[responseFormat]()
+              .then((data) => {
+                if (r.ok) {
+                  r.data = data;
+                } else {
+                  r.error = data;
+                }
+                return r;
+              })
+              .catch((e) => {
+                r.error = e;
+                return r;
+              });
 
       if (cancelToken) {
         this.abortControllers.delete(cancelToken);
@@ -402,7 +408,7 @@ export class HttpClient<SecurityDataType = unknown> {
  * @baseUrl http://localhost:5188
  */
 export class Api<
-  SecurityDataType extends unknown,
+    SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
   api = {
     /**
@@ -413,14 +419,14 @@ export class Api<
      * @request POST:/api/auth/register
      */
     authRegister: (data: RegisterRequestDto, params: RequestParams = {}) =>
-      this.request<UserResponseDto, ProblemDetails>({
-        path: `/api/auth/register`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
+        this.request<UserResponseDto, ProblemDetails>({
+          path: `/api/auth/register`,
+          method: "POST",
+          body: data,
+          type: ContentType.Json,
+          format: "json",
+          ...params,
+        }),
 
     /**
      * No description
@@ -430,14 +436,14 @@ export class Api<
      * @request POST:/api/auth/login
      */
     authLogin: (data: LoginRequestDto, params: RequestParams = {}) =>
-      this.request<UserResponseDto, ProblemDetails>({
-        path: `/api/auth/login`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
+        this.request<UserResponseDto, ProblemDetails>({
+          path: `/api/auth/login`,
+          method: "POST",
+          body: data,
+          type: ContentType.Json,
+          format: "json",
+          ...params,
+        }),
 
     /**
      * No description
@@ -447,12 +453,12 @@ export class Api<
      * @request GET:/api/auth/me
      */
     authMe: (params: RequestParams = {}) =>
-      this.request<UserResponseDto, ProblemDetails>({
-        path: `/api/auth/me`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
+        this.request<UserResponseDto, ProblemDetails>({
+          path: `/api/auth/me`,
+          method: "GET",
+          format: "json",
+          ...params,
+        }),
 
     /**
      * No description
@@ -462,11 +468,11 @@ export class Api<
      * @request POST:/api/auth/logout
      */
     authLogout: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/api/auth/logout`,
-        method: "POST",
-        ...params,
-      }),
+        this.request<void, any>({
+          path: `/api/auth/logout`,
+          method: "POST",
+          ...params,
+        }),
 
     /**
      * No description
@@ -476,12 +482,12 @@ export class Api<
      * @request GET:/api/categories
      */
     categoryGetAll: (params: RequestParams = {}) =>
-      this.request<Category[], any>({
-        path: `/api/categories`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
+        this.request<Category[], any>({
+          path: `/api/categories`,
+          method: "GET",
+          format: "json",
+          ...params,
+        }),
 
     /**
      * No description
@@ -491,17 +497,17 @@ export class Api<
      * @request POST:/api/categories
      */
     categoryCreate: (
-      data: CreateCategoryRequestDto,
-      params: RequestParams = {},
+        data: CreateCategoryRequestDto,
+        params: RequestParams = {},
     ) =>
-      this.request<Category, any>({
-        path: `/api/categories`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
+        this.request<Category, any>({
+          path: `/api/categories`,
+          method: "POST",
+          body: data,
+          type: ContentType.Json,
+          format: "json",
+          ...params,
+        }),
 
     /**
      * No description
@@ -511,15 +517,15 @@ export class Api<
      * @request GET:/api/categories/{id}
      */
     categoryGetById: (
-      { id }: CategoryGetByIdParams,
-      params: RequestParams = {},
+        { id }: CategoryGetByIdParams,
+        params: RequestParams = {},
     ) =>
-      this.request<Category, ProblemDetails>({
-        path: `/api/categories/${id}`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
+        this.request<Category, ProblemDetails>({
+          path: `/api/categories/${id}`,
+          method: "GET",
+          format: "json",
+          ...params,
+        }),
 
     /**
      * No description
@@ -529,12 +535,12 @@ export class Api<
      * @request GET:/api/items
      */
     itemGetAll: (params: RequestParams = {}) =>
-      this.request<Item[], any>({
-        path: `/api/items`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
+        this.request<Item[], any>({
+          path: `/api/items`,
+          method: "GET",
+          format: "json",
+          ...params,
+        }),
 
     /**
      * No description
@@ -544,12 +550,12 @@ export class Api<
      * @request GET:/api/listings
      */
     listingGetAll: (params: RequestParams = {}) =>
-      this.request<ListingResponseDto[], any>({
-        path: `/api/listings`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
+        this.request<ListingResponseDto[], any>({
+          path: `/api/listings`,
+          method: "GET",
+          format: "json",
+          ...params,
+        }),
 
     /**
      * No description
@@ -559,17 +565,31 @@ export class Api<
      * @request POST:/api/listings
      */
     listingCreate: (
-      data: CreateListingRequestDto,
-      params: RequestParams = {},
+        data: CreateListingRequestDto,
+        params: RequestParams = {},
     ) =>
-      this.request<Listing, ProblemDetails>({
-        path: `/api/listings`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
+        this.request<Listing, ProblemDetails>({
+          path: `/api/listings`,
+          method: "POST",
+          body: data,
+          type: ContentType.Json,
+          format: "json",
+          ...params,
+        }),
+
+    /**
+     * No description
+     *
+     * @tags Listing
+     * @name ListingDelete
+     * @request DELETE:/api/listings/{id}
+     */
+    listingDelete: ({ id }: ListingDeleteParams, params: RequestParams = {}) =>
+        this.request<void, ProblemDetails>({
+          path: `/api/listings/${id}`,
+          method: "DELETE",
+          ...params,
+        }),
 
     /**
      * No description
@@ -579,14 +599,14 @@ export class Api<
      * @request POST:/api/orders
      */
     orderCreate: (data: CreateOrderRequestDto, params: RequestParams = {}) =>
-      this.request<Order, ProblemDetails>({
-        path: `/api/orders`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
+        this.request<Order, ProblemDetails>({
+          path: `/api/orders`,
+          method: "POST",
+          body: data,
+          type: ContentType.Json,
+          format: "json",
+          ...params,
+        }),
 
     /**
      * No description
@@ -596,11 +616,11 @@ export class Api<
      * @request GET:/api/orders/my-orders
      */
     orderGetMyOrders: (params: RequestParams = {}) =>
-      this.request<Order[], ProblemDetails>({
-        path: `/api/orders/my-orders`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
+        this.request<Order[], ProblemDetails>({
+          path: `/api/orders/my-orders`,
+          method: "GET",
+          format: "json",
+          ...params,
+        }),
   };
 }
