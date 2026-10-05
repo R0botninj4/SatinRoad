@@ -8,16 +8,13 @@
 
 /* Title box at the top */
 .main-page-title {
-    padding: 1rem 4rem;
-}
-
-.main-page-title h1 {
-    margin: 0;
+    padding: 1rem 0;
 }
 
 /* Logo in the title */
 .main-page-logo {
     display: block;
+    margin: 0 auto;
     max-width: min(600px, 100%);
     height: auto;
 }
