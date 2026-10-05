@@ -4,9 +4,19 @@ namespace Service;
 
 public static class OrderHelpers
 {
-    public static decimal CalculateTotalPrice(decimal price, int quantity)
+    public static decimal CalculateTotalPrice(
+        decimal price,
+        int quantity,
+        int previousOrders = 0)
     {
-        return price * quantity;
+        var total = price * quantity;
+
+        if (HasLoyaltyDiscount(previousOrders))
+        {
+            return decimal.Round(total * 0.80m, 2);
+        }
+
+        return total;
     }
 
     public static int CalculateRemainingStock(int stock, int quantity)
@@ -17,5 +27,10 @@ public static class OrderHelpers
         }
 
         return stock - quantity;
+    }
+    
+    public static bool HasLoyaltyDiscount(int previousOrders)
+    {
+        return previousOrders % 11 == 10;
     }
 }

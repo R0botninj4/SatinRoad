@@ -1,14 +1,20 @@
 ﻿import { useEffect, useRef, useState } from "react";
-import type { Listing } from "../api/Api";
+import type { ListingResponseDto } from "../api/Api";
 import { api } from "../Auth/apiClient";
 import { AmountPicker } from "./AmountPicker";
 import "./Dialog.css";
 
 type BuyDialogProps = {
-    listing: Listing;
+    listing: ListingResponseDto;
     productName: string;
     onClose: () => void;
     onBought: () => void;
+};
+
+type Quote = {
+    amount: number;
+    totalPrice: number;
+    discountApplied: boolean;
 };
 
 export function BuyDialog({
@@ -19,21 +25,53 @@ export function BuyDialog({
                           }: BuyDialogProps) {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [amount, setAmount] = useState(1);
+    const [quote, setQuote] = useState<Quote | null>(null);
+    const [quoteError, setQuoteError] = useState("");
     const [error, setError] = useState("");
+    const [buying, setBuying] = useState(false);
 
     useEffect(() => {
         dialogRef.current?.showModal();
     }, []);
 
+    useEffect(() => {
+        if (!listing.id) return;
+
+        let active = true;
+        setQuote(null);
+        setQuoteError("");
+
+        api.api.orderGetQuote({
+            ListingId: listing.id,
+            Quantity: amount,
+        })
+            .then((result) => {
+                if (active && result.totalPrice !== undefined) {
+                    setQuote({
+                        amount,
+                        totalPrice: result.totalPrice,
+                        discountApplied: result.discountApplied ?? false,
+                    });
+                }
+            })
+            .catch(() => {
+                if (active) setQuoteError("Could not load the current price.");
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [listing.id, amount]);
+
     const price = listing.price ?? 0;
     const quantity = listing.quantity ?? 0;
-    const total = amount * price;
+    const currentQuote = quote?.amount === amount ? quote : null;
 
     async function handleBuy() {
-        if (!listing.id) {
-            setError("Listing ID is missing.");
-            return;
-        }
+        if (!listing.id || !currentQuote || buying) return;
+
+        setBuying(true);
+        setError("");
 
         try {
             await api.api.orderCreate({
@@ -45,6 +83,8 @@ export function BuyDialog({
             onBought();
         } catch {
             setError("Could not complete the purchase.");
+        } finally {
+            setBuying(false);
         }
     }
 
@@ -74,8 +114,28 @@ export function BuyDialog({
             />
 
             <p className="sign-dialog-text">
-                <strong>Total: {total.toFixed(2)} kr</strong>
+                {currentQuote ? (
+                    <>
+                        <strong>
+                            Total: {currentQuote.totalPrice.toFixed(2)} kr
+                        </strong>
+                        {currentQuote.discountApplied && (
+                            <>
+                                <br />
+                                20% loyalty discount applied
+                            </>
+                        )}
+                    </>
+                ) : (
+                    "Calculating price..."
+                )}
             </p>
+
+            {quoteError && (
+                <p className="sign-dialog-error" role="alert">
+                    {quoteError}
+                </p>
+            )}
 
             {error && (
                 <p className="sign-dialog-error" role="alert">
@@ -96,8 +156,9 @@ export function BuyDialog({
                     type="button"
                     className="stone-button"
                     onClick={handleBuy}
+                    disabled={!currentQuote || buying}
                 >
-                    Buy
+                    {buying ? "Buying..." : "Buy"}
                 </button>
             </div>
         </dialog>
