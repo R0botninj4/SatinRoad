@@ -3,10 +3,14 @@
 // Shared API client. "include" makes the browser send the login cookie to the
 // API, which runs on a different port than the client.
 // Not placed in src/api/ because `bun run gen:api` wipes that folder.
+const isLocal = ["localhost", "127.0.0.1"].includes(
+    window.location.hostname,
+);
+
 export const api = new Api({
+    baseUrl: isLocal ? "http://localhost:5188" : window.location.origin,
     baseApiParams: { credentials: "include", headers: {} },
 });
-
 // Turns whatever the API client throws into a message a person can act on.
 export function getErrorMessage(error: unknown): string {
     if (error instanceof TypeError) {
