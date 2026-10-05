@@ -81,22 +81,53 @@ using (var scope = app.Services.CreateScope())
         WHERE ItemId = 0 AND EXISTS (SELECT 1 FROM Listing WHERE Listing.Id = [Order].ListingId)
         """);
 
-    var items = new List<Item>
+    // Upgrade databases created before items had a category.
+    var hasCategoryId = db.Execute<int>(
+        "SELECT COUNT(*) FROM pragma_table_info('Item') WHERE name = 'CategoryId'");
+    if (hasCategoryId == 0)
     {
-        new() { Id = 1, Name = "Blaze rod" },
-        new() { Id = 2, Name = "Wheat" },
-        new() { Id = 3, Name = "Sugar" },
-        new() { Id = 4, Name = "Sugar cane" },
-        new() { Id = 5, Name = "TNT" },
-        new() { Id = 6, Name = "Seeds" },
-        new() { Id = 7, Name = "Iron sword" },
-        new() { Id = 8, Name = "Gold helmet" },
-        new() { Id = 9, Name = "Stick" }
+        db.Execute("ALTER TABLE Item ADD COLUMN CategoryId TEXT");
+    }
+
+    // Fixed categories, so items can refer to them by a stable id.
+    var categories = new List<Category>
+    {
+        new() { Id = "drug", Name = "Drug" },
+        new() { Id = "weapon", Name = "Weapon" },
+        new() { Id = "artifact", Name = "Stolen artifact" },
+        new() { Id = "farming", Name = "Farming" }
     };
 
+    foreach (var category in categories)
+    {
+        if (!db.Categories.Any(existingCategory => existingCategory.Id == category.Id))
+        {
+            db.Insert(category);
+        }
+    }
+
+    // every item now has a CategoryId.
+    var items = new List<Item>
+    {
+        new() { Id = 1, Name = "Blaze rod", CategoryId = "drug" },
+        new() { Id = 2, Name = "Wheat", CategoryId = "drug" },
+        new() { Id = 3, Name = "Sugar", CategoryId = "drug" },
+        new() { Id = 4, Name = "Sugar cane", CategoryId = "farming" },
+        new() { Id = 5, Name = "TNT", CategoryId = "weapon" },
+        new() { Id = 6, Name = "Seeds", CategoryId = "farming" },
+        new() { Id = 7, Name = "Iron sword", CategoryId = "weapon" },
+        new() { Id = 8, Name = "Gold helmet", CategoryId = "artifact" },
+        new() { Id = 9, Name = "Stick", CategoryId = "artifact" }
+    };
+
+    // insert new items, and update existing ones so they get their category.
     foreach (var item in items)
     {
-        if (!db.Items.Any(existingItem => existingItem.Id == item.Id))
+        if (db.Items.Any(existingItem => existingItem.Id == item.Id))
+        {
+            db.Update(item);
+        }
+        else
         {
             db.Insert(item);
         }
