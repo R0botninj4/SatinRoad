@@ -1,10 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Infra;
-using LinqToDB;
 
 namespace Service;
 
-public class OrderService(MyDatabaseConnection db)
+public class OrderService(IApplicationData db)
 {
     public Order Create(string buyerId, CreateOrderRequestDto dto)
     {

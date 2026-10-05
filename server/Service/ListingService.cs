@@ -1,10 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Infra;
-using LinqToDB;
 
 namespace Service;
 
-public class ListingService(MyDatabaseConnection db)
+public class ListingService(IApplicationData db)
 {
     public List<ListingResponseDto> GetAll()
     {

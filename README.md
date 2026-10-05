@@ -76,7 +76,7 @@ The existing category and item endpoints keep their current public access.
 
 Validation used a separate temporary SQLite database: registration, duplicate
 usernames, invalid input, successful login and incorrect passwords.
-These scenarios are now covered by the automated backend test suite described below.
+Service-level account behavior is covered by the unit test suite described below.
 
 ## Automated tests and quality assurance
 
@@ -87,12 +87,18 @@ arrange the required data, perform the action, and assert both the response and
 the resulting database state (Arrange–Act–Assert). Run the suite after changes
 and before merging a pull request; add regression tests when fixing bugs.
 
-The xUnit project `server/Service.Tests` exercises all five backend services
-with Linq2db and a real, isolated temporary SQLite database per test. These are
-service/database integration tests, rather than mocked unit tests. They use
-the same table mappings and username uniqueness index as the application.
-Database connections are disposed and temporary files deleted after each test;
-the application database and Docker volume are never used.
+The xUnit project `server/Service.Tests` contains unit tests for all five
+backend services. Each test uses a fresh `FakeApplicationData` with in-memory
+collections through the `IApplicationData` interface. Account tests also use
+`FakePasswordHasher` to control password verification and check when hashing
+is requested. No database, files, network, web server or real password hashing
+is used by the tests.
+
+Production still uses `MyDatabaseConnection` with Linq2db; dependency injection
+provides it through `IApplicationData`. The fake copies entities when reading
+and writing so tests can distinguish an explicit update from a change to a
+returned object. The tests verify service decisions, calculated values and
+calls to dependencies. They do not verify SQL queries or database persistence.
 
 Separate tests exercise the DTO validation annotations used by ASP.NET Core.
 This distinction matters: services do not automatically execute those annotations.
@@ -111,13 +117,13 @@ dotnet test SatinRoad.slnx --configuration Release --collect:"XPlat Code Coverag
 
 The collector writes a `coverage.cobertura.xml` under `TestResults`.
 Coverage helps identify untested behavior; 100% coverage is not the goal.
-We prioritize logic that can affect stock, order totals, account access and data isolation.
+We prioritize logic that can affect stock, order totals, account access and buyer-specific results.
 
 | Area | Automated scenarios |
 | --- | --- |
-| Orders | Exact decimal totals, persisted order details, partial purchases, buying the last stock, insufficient stock, missing buyer/listing, sold-out purchases, buyer-specific history sorted newest first |
-| Listings | Persisted owner/product/price/stock, trimmed description, missing user/product rejection, vendor display name and fallback |
-| Accounts | Verifiable password hashing, case-insensitive duplicate rejection and login, wrong password, unknown user, user lookup, upgrading older password hashes |
+| Orders | Exact decimal totals, order data passed to the fake, partial purchases, buying the last stock, insufficient stock, missing buyer/listing, sold-out purchases, buyer-specific history sorted newest first |
+| Listings | Owner/product/price/stock passed to the fake, trimmed description, missing user/product rejection, vendor display name and fallback |
+| Accounts | Delegating password hashing and verification, case-insensitive duplicate rejection and login, failed verification, unknown user, user lookup, requesting a hash upgrade |
 | Categories and products | Trimmed category names, blank-name rejection, lookup, product ordering and empty catalog |
 | Request validation | Nonpositive quantities/prices, missing listing/product IDs, minimum price, username and password length |
 
@@ -126,10 +132,10 @@ suite on pull requests and pushes to `main`/`master`, and uploads coverage
 results as a workflow artifact. The local suite is also run before submitting
 the test changes for review.
 
-Limitations: these tests do not exercise HTTP middleware, cookie authorization,
-React/browser behavior, concurrent purchases or transaction rollback. Those
-need additional API, browser or concurrency tests; passing this suite alone
-does not demonstrate production readiness.
+Scope: this suite contains only unit tests. Database mappings, SQL translation,
+database constraints, cryptographic hashing, HTTP middleware, cookie authorization,
+React/browser behavior, concurrent purchases and transaction rollback are outside
+its scope. Passing these tests does not demonstrate production readiness.
 
 ## Earlier setup validation
 

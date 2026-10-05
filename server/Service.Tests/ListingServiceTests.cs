@@ -1,13 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using Infra;
-using LinqToDB;
 
 namespace Service.Tests;
 
-public class ListingServiceTests : TestDatabase
+public class ListingServiceTests : TestData
 {
     [Fact]
-    public void Creating_listing_persists_owner_price_stock_and_trimmed_description()
+    public void Creating_listing_passes_owner_price_stock_and_trimmed_description_to_store()
     {
         AddUser();
         Db.Insert(new Item { Id = 1, Name = "Wheat" });
@@ -52,7 +51,7 @@ public class ListingServiceTests : TestDatabase
     public void Listing_with_missing_vendor_uses_fallback_name()
     {
         AddListing();
-        Db.Users.Where(user => user.Id == "vendor").Delete();
+        Db.RemoveUser("vendor");
         Assert.Equal("Unknown vendor", Assert.Single(new ListingService(Db).GetAll()).Username);
     }
 }

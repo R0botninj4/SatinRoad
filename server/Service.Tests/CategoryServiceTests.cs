@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Service.Tests;
 
-public class CategoryServiceTests : TestDatabase
+public class CategoryServiceTests : TestData
 {
     [Fact]
-    public void Category_is_trimmed_persisted_and_retrievable()
+    public void Category_is_trimmed_added_to_store_and_retrievable()
     {
         var service = new CategoryService(Db);
         var category = service.Create(new() { Name = "  Materials  " });

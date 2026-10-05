@@ -1,9 +1,8 @@
 using Infra;
-using LinqToDB;
 
 namespace Service.Tests;
 
-public class ItemServiceTests : TestDatabase
+public class ItemServiceTests : TestData
 {
     [Fact]
     public void Products_are_returned_in_id_order()

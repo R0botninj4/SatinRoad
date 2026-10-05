@@ -1,10 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Infra;
-using LinqToDB;
 
 namespace Service;
 
-public class CategoryService(MyDatabaseConnection db)
+public class CategoryService(IApplicationData db)
 {
     public List<Category> GetAll()
     {

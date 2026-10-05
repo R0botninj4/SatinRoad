@@ -25,6 +25,8 @@ var dataOptions = new DataOptions<MyDatabaseConnection>(options);
 
 builder.Services.AddScoped<MyDatabaseConnection>(
     _ => new MyDatabaseConnection(dataOptions));
+builder.Services.AddScoped<IApplicationData>(
+    provider => provider.GetRequiredService<MyDatabaseConnection>());
 
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ItemService>();
