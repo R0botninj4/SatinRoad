@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../Auth/apiClient";
-import type { Item, Listing } from "../api/Api";
+import type { Category, Item, Listing } from "../api/Api";
 import "./MainPage.css";
 import logo from "../assets/SatinRoadLogo.png";
 import { AuthStatus } from "../components/AuthStatus";
@@ -31,17 +31,25 @@ const itemImages: Record<number, string> = {
 export function MainPage() {
     const [items, setItems] = useState<Item[]>([]);
     const [listings, setListings] = useState<Listing[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    // "" means "All categories"
+    const [selectedCategory, setSelectedCategory] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     useEffect(() => {
         async function loadData() {
             try {
-                const loadedItems = await api.api.itemGetAll();
-                const loadedListings = await api.api.listingGetAll();
+                // Load all three at the same time instead of one after another
+                const [loadedItems, loadedListings, loadedCategories] = await Promise.all([
+                    api.api.itemGetAll(),
+                    api.api.listingGetAll(),
+                    api.api.categoryGetAll(),
+                ]);
 
                 setItems(loadedItems);
                 setListings(loadedListings);
+                setCategories(loadedCategories);
             } catch {
                 setError("Could not load items and listings.");
             } finally {
@@ -52,21 +60,47 @@ export function MainPage() {
         loadData();
     }, []);
 
+    const visibleItems = selectedCategory
+        ? items.filter((item) => item.categoryId === selectedCategory)
+        : items;
+
     return (
         <section className="main-page">
             <AuthStatus />
 
             <header className="main-page-title">
                 <h1>
-                    <img src={logo} alt="SatinRoad" className="SatinRoadLogo" />
+                    <img src={logo} alt="SatinRoad" className="main-page-logo" />
                 </h1>
             </header>
 
             {loading && <p>Loading items...</p>}
             {error && <p>{error}</p>}
 
+            <div className="main-page-toolbar">
+                <label className="category-filter">
+                    <span>Category</span>
+                    <select
+                        className="category-select"
+                        value={selectedCategory}
+                        onChange={(event) => setSelectedCategory(event.target.value)}
+                    >
+                        <option value="">All</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id ?? ""}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+            </div>
+
+            {!loading && visibleItems.length === 0 && (
+                <p>No items in this category yet.</p>
+            )}
+
             <div className="product-grid">
-                {items.map((item) => {
+                {visibleItems.map((item) => {
                     const itemListings = listings.filter(
                         (listing) => listing.itemId === item.id,
                     );
