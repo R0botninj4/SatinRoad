@@ -76,7 +76,60 @@ The existing category and item endpoints keep their current public access.
 
 Validation used a separate temporary SQLite database: registration, duplicate
 usernames, invalid input, successful login and incorrect passwords.
-Unit tests are deferred to the planned Test Last phase.
+These scenarios are now covered by the automated backend test suite described below.
+
+## Automated tests and quality assurance
+
+We use **Test Last**: the application features were implemented first, then
+automated tests were added against the existing requirements. For each feature
+we identify successful behavior, rejection cases and important boundaries,
+arrange the required data, perform the action, and assert both the response and
+the resulting database state (Arrange–Act–Assert). Run the suite after changes
+and before merging a pull request; add regression tests when fixing bugs.
+
+The xUnit project `server/Service.Tests` exercises all five backend services
+with Linq2db and a real, isolated temporary SQLite database per test. These are
+service/database integration tests, rather than mocked unit tests. They use
+the same table mappings and username uniqueness index as the application.
+Database connections are disposed and temporary files deleted after each test;
+the application database and Docker volume are never used.
+
+Separate tests exercise the DTO validation annotations used by ASP.NET Core.
+This distinction matters: services do not automatically execute those annotations.
+
+Run from the repository root with the .NET 10 SDK (no running app or Docker needed):
+
+```powershell
+dotnet test SatinRoad.slnx --configuration Release
+```
+
+To also collect coverage:
+
+```powershell
+dotnet test SatinRoad.slnx --configuration Release --collect:"XPlat Code Coverage" --results-directory TestResults
+```
+
+The collector writes a `coverage.cobertura.xml` under `TestResults`.
+Coverage helps identify untested behavior; 100% coverage is not the goal.
+We prioritize logic that can affect stock, order totals, account access and data isolation.
+
+| Area | Automated scenarios |
+| --- | --- |
+| Orders | Exact decimal totals, persisted order details, partial purchases, buying the last stock, insufficient stock, missing buyer/listing, sold-out purchases, buyer-specific history sorted newest first |
+| Listings | Persisted owner/product/price/stock, trimmed description, missing user/product rejection, vendor display name and fallback |
+| Accounts | Verifiable password hashing, case-insensitive duplicate rejection and login, wrong password, unknown user, user lookup, upgrading older password hashes |
+| Categories and products | Trimmed category names, blank-name rejection, lookup, product ordering and empty catalog |
+| Request validation | Nonpositive quantities/prices, missing listing/product IDs, minimum price, username and password length |
+
+GitHub Actions (`.github/workflows/backend-tests.yml`) runs the Release test
+suite on pull requests and pushes to `main`/`master`, and uploads coverage
+results as a workflow artifact. The local suite is also run before submitting
+the test changes for review.
+
+Limitations: these tests do not exercise HTTP middleware, cookie authorization,
+React/browser behavior, concurrent purchases or transaction rollback. Those
+need additional API, browser or concurrency tests; passing this suite alone
+does not demonstrate production readiness.
 
 ## Earlier setup validation
 
@@ -90,7 +143,7 @@ Unit tests are deferred to the planned Test Last phase.
 
 ## Remaining work
 
-Product features, automated tests, testing methodology documentation
-and Lighthouse sustainability measurements are not implemented yet.
+Category administration, editing/restocking/removing listings, bonus features
+and Lighthouse sustainability measurements still need work.
 
 The current Docker setup is intended for running locally.
