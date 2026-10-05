@@ -1,0 +1,132 @@
+﻿/* Wider than the 1100px #root, centered on the screen */
+.profile-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1500px, calc(100vw - 6rem));
+}
+
+.profile-back {
+    align-self: flex-start;
+    color: inherit;
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* Username as a game nametag: grayish and a bit see-through */
+.profile-name {
+    align-self: center;
+    width: fit-content;
+    margin: 0 auto;
+    text-align: center;
+    padding: 0.4rem 1.5rem;
+    font-size: 1.75rem;
+    font-weight: normal;
+    color: #fff;
+    text-shadow: 2px 2px 0 #3f3f3f;
+    background: rgba(70, 70, 70, 0.6);
+}
+
+/* The two lists side by side */
+.profile-lists {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: stretch;
+}
+
+/* Oak sign behind each list, same as the product and login pages */
+.profile-sign {
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 26rem;
+    padding: 2rem;
+    font-size: 1.15rem;
+    background:
+            linear-gradient(rgba(255, 240, 205, 0.28), rgba(255, 240, 205, 0.28)),
+            url("../assets/Sign.png") top left / 128px 64px repeat;
+    image-rendering: pixelated;
+    border: 3px solid #4a3a22;
+    color: #2b1d0e;
+}
+
+.profile-sign-title {
+    margin: 0 0 0.75rem;
+    font-size: 1.6rem;
+    text-align: center;
+}
+
+/* Minecraft sign-style divider under the title */
+.profile-sign-title::after {
+    content: "------------------------------------------------------------------------------------------------------------------------------------------------------" / "";
+    display: block;
+    width: 0;
+    min-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.profile-table th,
+.profile-table td {
+    padding: 0.75rem 0.5rem;
+}
+
+.profile-table thead th {
+    font-weight: 600;
+}
+
+/* Right-align the price column and the last column */
+.profile-table th:nth-child(3),
+.profile-table td:nth-child(3),
+.profile-table th:last-child,
+.profile-table td:last-child {
+    text-align: right;
+}
+
+/* Delete button column: as narrow as the button */
+.profile-table th:nth-child(4),
+.profile-table td:nth-child(4) {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.profile-delete {
+    font-size: 1rem;
+    padding: 0.35rem 0.9rem;
+}
+
+/* Minecraft sign-style divider between rows */
+.sign-divider td {
+    padding: 0 0.5rem;
+    text-align: left;
+}
+
+.sign-divider td::before {
+    content: "------------------------------------------------------------------------------------------------------------------------------------------------------" / "";
+    display: block;
+    width: 0;
+    min-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.profile-link {
+    color: inherit;
+}
+
+/* Stack the lists on narrow screens */
+@media (max-width: 800px) {
+    .profile-lists {
+        grid-template-columns: 1fr;
+    }
+}

@@ -12,7 +12,9 @@ export function AuthStatus() {
         <nav className="auth-status" aria-label="Account">
             {user ? (
                 <>
-                    <span>{user.username}</span>
+                    <Link to="/profile" className="auth-status-link">
+                        {user.username}
+                    </Link>
                     <button type="button" className="auth-status-link" onClick={logout}>
                         Log out
                     </button>
