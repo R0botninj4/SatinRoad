@@ -73,7 +73,10 @@ using (var scope = app.Services.CreateScope())
         new() { Id = 3, Name = "Sugar" },
         new() { Id = 4, Name = "Sugar cane" },
         new() { Id = 5, Name = "TNT" },
-        new() { Id = 6, Name = "Seeds" }
+        new() { Id = 6, Name = "Seeds" },
+        new() { Id = 7, Name = "Iron sword" },
+        new() { Id = 8, Name = "Gold helmet" },
+        new() { Id = 9, Name = "Stick" }
     };
 
     foreach (var item in items)
