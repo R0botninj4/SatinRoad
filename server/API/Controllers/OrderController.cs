@@ -52,4 +52,29 @@ public class OrderController(OrderService orderService)
 
         return Ok(orderService.GetMyOrders(buyerId));
     }
+    
+    [Authorize]
+    [HttpGet("quote")]
+    [ProducesResponseType(typeof(OrderQuoteResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public ActionResult<OrderQuoteResponseDto> GetQuote(
+        [FromQuery] CreateOrderRequestDto dto)
+    {
+        var buyerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (buyerId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            return Ok(orderService.GetQuote(buyerId, dto));
+        }
+        catch (ValidationException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
 }

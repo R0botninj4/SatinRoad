@@ -132,6 +132,18 @@ using (var scope = app.Services.CreateScope())
             db.Insert(item);
         }
     }
+    var hasSellerId = db.Execute<int>(
+        "SELECT COUNT(*) FROM pragma_table_info('Order') WHERE name = 'SellerId'");
+    if (hasSellerId == 0)
+    {
+        db.Execute("ALTER TABLE [Order] ADD COLUMN SellerId TEXT NOT NULL DEFAULT ''");
+    }
+
+    db.Execute("""
+               UPDATE [Order]
+               SET SellerId = (SELECT UserId FROM Listing WHERE Listing.Id = [Order].ListingId)
+               WHERE SellerId = '' AND EXISTS (SELECT 1 FROM Listing WHERE Listing.Id = [Order].ListingId)
+               """);
 }
 
 app.Run();

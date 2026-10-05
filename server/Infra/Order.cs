@@ -24,4 +24,7 @@ public class Order
 
     [Column]
     public DateTime CreatedAt { get; set; }
+    
+    [Column]
+    public string SellerId { get; set; } = "";
 }

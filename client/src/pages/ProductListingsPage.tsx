@@ -2,7 +2,7 @@
 import { Link, useParams } from "react-router-dom";
 import { api } from "../Auth/apiClient";
 import { useAuth } from "../Auth/AuthProvider";
-import type { Item, Listing as ApiListing } from "../api/Api";
+import type { Item, ListingResponseDto as ApiListing } from "../api/Api";
 import { BuyDialog } from "../components/BuyDialog";
 import { SellDialog, type NewListing } from "../components/SellDialog";
 import "./ProductListingsPage.css";
@@ -56,12 +56,9 @@ export function ProductListingsPage() {
 
                 setItem(selectedItem ?? null);
 
-                const selectedListings = allListings
-                    .filter((listing) => listing.itemId === itemId)
-                    .sort(
-                        (first, second) =>
-                            (first.price ?? 0) - (second.price ?? 0),
-                    );
+                const selectedListings = allListings.filter(
+                    (listing) => listing.itemId === itemId,
+                );
 
                 setListings(selectedListings);
             } catch {
@@ -90,12 +87,7 @@ export function ProductListingsPage() {
             const allListings = await api.api.listingGetAll();
 
             setListings(
-                allListings
-                    .filter((listing) => listing.itemId === itemId)
-                    .sort(
-                        (first, second) =>
-                            (first.price ?? 0) - (second.price ?? 0),
-                    ),
+                allListings.filter((listing) => listing.itemId === itemId),
             );
 
             setSelling(false);
@@ -198,6 +190,7 @@ export function ProductListingsPage() {
                             <tr>
                                 <td>
                                     {listing.username ?? "Unknown vendor"}
+                                    {listing.isFeatured && <span title="Featured vendor"> ★</span>}
                                 </td>
 
                                 <td>{listing.quantity ?? 0}</td>
@@ -242,12 +235,7 @@ export function ProductListingsPage() {
                         const allListings = await api.api.listingGetAll();
 
                         setListings(
-                            allListings
-                                .filter((listing) => listing.itemId === itemId)
-                                .sort(
-                                    (first, second) =>
-                                        (first.price ?? 0) - (second.price ?? 0),
-                                ),
+                            allListings.filter((listing) => listing.itemId === itemId),
                         );
 
                         setBuyingListing(null);

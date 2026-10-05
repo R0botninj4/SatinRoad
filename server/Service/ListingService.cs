@@ -20,6 +20,9 @@ public class ListingService(MyDatabaseConnection db)
                     .Select(user => user.Username)
                     .FirstOrDefault();
 
+                var numberOfSales = db.Orders.Count(order =>
+                    order.SellerId == listing.UserId);
+
                 return new ListingResponseDto
                 {
                     Id = listing.Id,
@@ -28,9 +31,12 @@ public class ListingService(MyDatabaseConnection db)
                     ItemId = listing.ItemId,
                     Price = listing.Price,
                     Quantity = listing.Quantity,
-                    Description = listing.Description
+                    Description = listing.Description,
+                    IsFeatured = numberOfSales > 100
                 };
             })
+            .OrderByDescending(listing => listing.IsFeatured)
+            .ThenBy(listing => listing.Price)
             .ToList();
     }
 

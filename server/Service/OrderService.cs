@@ -24,15 +24,24 @@ public class OrderService(MyDatabaseConnection db)
         }
 
         var remainingStock = OrderHelpers.CalculateRemainingStock(listing.Quantity, dto.Quantity);
+        
+        var previousOrders = db.Orders.Count(order =>
+            order.BuyerId == buyerId && order.SellerId == listing.UserId);
+
+        var totalPrice = OrderHelpers.CalculateTotalPrice(
+            listing.Price,
+            dto.Quantity,
+            previousOrders);
 
         var order = new Order
         {
             Id = Guid.NewGuid().ToString(),
             BuyerId = buyerId,
+            SellerId = listing.UserId,
             ListingId = dto.ListingId,
             ItemId = listing.ItemId,
             Quantity = dto.Quantity,
-            TotalPrice = OrderHelpers.CalculateTotalPrice(listing.Price, dto.Quantity),
+            TotalPrice = totalPrice,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -50,6 +59,34 @@ public class OrderService(MyDatabaseConnection db)
 
         return order;
     }
+    
+    public OrderQuoteResponseDto GetQuote(string buyerId, CreateOrderRequestDto dto)
+    {
+        var listing = db.Listings.FirstOrDefault(listing =>
+            listing.Id == dto.ListingId);
+
+        if (listing is null)
+        {
+            throw new ValidationException("Listing does not exist.");
+        }
+
+        if (dto.Quantity < 1)
+        {
+            throw new ValidationException("Quantity must be at least 1.");
+        }
+
+        OrderHelpers.CalculateRemainingStock(listing.Quantity, dto.Quantity);
+
+        var previousOrders = db.Orders.Count(order =>
+            order.BuyerId == buyerId && order.SellerId == listing.UserId);
+
+        return new OrderQuoteResponseDto
+        {
+            TotalPrice = OrderHelpers.CalculateTotalPrice(
+                listing.Price, dto.Quantity, previousOrders),
+            DiscountApplied = OrderHelpers.HasLoyaltyDiscount(previousOrders)
+        };
+    }
     public List<Order> GetMyOrders(string buyerId)
     {
         return db.Orders
@@ -57,4 +94,6 @@ public class OrderService(MyDatabaseConnection db)
             .OrderByDescending(order => order.CreatedAt)
             .ToList();
     }
+    
+    
 }

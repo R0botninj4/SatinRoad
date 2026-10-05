@@ -80,6 +80,7 @@ export interface ListingResponseDto {
   /** @format int32 */
   quantity?: number;
   description?: string;
+  isFeatured?: boolean;
 }
 
 export interface Listing {
@@ -127,6 +128,7 @@ export interface Order {
   totalPrice?: number;
   /** @format date-time */
   createdAt?: string;
+  sellerId?: string;
 }
 
 export interface CreateOrderRequestDto {
@@ -140,12 +142,28 @@ export interface CreateOrderRequestDto {
   quantity?: number;
 }
 
+export interface OrderQuoteResponseDto {
+  /** @format decimal */
+  totalPrice?: number;
+  discountApplied?: boolean;
+}
+
 export interface CategoryGetByIdParams {
   id: string;
 }
 
 export interface ListingDeleteParams {
   id: string;
+}
+
+export interface OrderGetQuoteParams {
+  ListingId?: string;
+  /**
+   * @format int32
+   * @min 1
+   * @max 2147483647
+   */
+  Quantity?: number;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -620,6 +638,25 @@ export class Api<
       this.request<Order[], ProblemDetails>({
         path: `/api/orders/my-orders`,
         method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Order
+     * @name OrderGetQuote
+     * @request GET:/api/orders/quote
+     */
+    orderGetQuote: (
+      query: OrderGetQuoteParams = {},
+      params: RequestParams = {},
+    ) =>
+      this.request<OrderQuoteResponseDto, ProblemDetails>({
+        path: `/api/orders/quote`,
+        method: "GET",
+        query: query,
         format: "json",
         ...params,
       }),

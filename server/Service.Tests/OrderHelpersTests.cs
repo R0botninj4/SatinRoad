@@ -55,4 +55,23 @@ public class OrderHelpersTests
         // Act and Assert
         Assert.Throws<ValidationException>(() => OrderHelpers.CalculateRemainingStock(stock, quantity));
     }
+    
+    
+    
+    [Theory]
+    [InlineData(9, 1000)]
+    [InlineData(10, 800)]
+    [InlineData(11, 1000)]
+    [InlineData(20, 1000)]
+    [InlineData(21, 800)]
+    [InlineData(22, 1000)]
+    public void CalculateTotalPrice_DiscountOnlyEveryEleventhOrder(
+        int previousOrders,
+        int expectedTotal)
+    {
+        var total = OrderHelpers.CalculateTotalPrice(
+            10m, 100, previousOrders);
+
+        Assert.Equal((decimal)expectedTotal, total);
+    }
 }
