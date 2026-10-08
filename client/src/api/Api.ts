@@ -13,6 +13,7 @@
 export interface UserResponseDto {
   id?: string;
   username?: string;
+  isShutDown?: boolean;
 }
 
 export interface ProblemDetails {

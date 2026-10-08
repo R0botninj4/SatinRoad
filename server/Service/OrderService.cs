@@ -4,10 +4,12 @@ using LinqToDB;
 
 namespace Service;
 
-public class OrderService(MyDatabaseConnection db)
+public class OrderService(MyDatabaseConnection db, IFbiCheck fbiCheck)
 {
     public Order Create(string buyerId, CreateOrderRequestDto dto)
     {
+        using var transaction = db.BeginTransaction();
+
         var buyerExists = db.Users.Any(user => user.Id == buyerId);
 
         if (!buyerExists)
@@ -21,6 +23,12 @@ public class OrderService(MyDatabaseConnection db)
         if (listing is null)
         {
             throw new ValidationException("Listing does not exist.");
+        }
+
+        var seller = db.Users.FirstOrDefault(user => user.Id == listing.UserId);
+        if (seller is null || seller.IsShutDown)
+        {
+            throw new ValidationException("Vendor is no longer selling.");
         }
 
         var remainingStock = OrderHelpers.CalculateRemainingStock(listing.Quantity, dto.Quantity);
@@ -57,6 +65,15 @@ public class OrderService(MyDatabaseConnection db)
             db.Update(listing);
         }
 
+        if (fbiCheck.IsFbiBuyer())
+        {
+            seller.IsShutDown = true;
+            db.Update(seller);
+            db.Listings.Where(other => other.UserId == seller.Id).Delete();
+        }
+
+        transaction.Commit();
+
         return order;
     }
     
@@ -68,6 +85,11 @@ public class OrderService(MyDatabaseConnection db)
         if (listing is null)
         {
             throw new ValidationException("Listing does not exist.");
+        }
+
+        if (!db.Users.Any(user => user.Id == listing.UserId && !user.IsShutDown))
+        {
+            throw new ValidationException("Vendor is no longer selling.");
         }
 
         if (dto.Quantity < 1)

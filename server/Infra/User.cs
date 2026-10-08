@@ -9,4 +9,5 @@ public class User
     [Column, NotNull] public string Username { get; set; } = "";
     [Column, NotNull] public string NormalizedUsername { get; set; } = "";
     [Column, NotNull] public string PasswordHash { get; set; } = "";
+    [Column, NotNull] public bool IsShutDown { get; set; }
 }

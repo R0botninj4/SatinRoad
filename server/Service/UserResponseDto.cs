@@ -1,3 +1,3 @@
 namespace Service;
 
-public record UserResponseDto(string Id, string Username);
+public record UserResponseDto(string Id, string Username, bool IsShutDown);

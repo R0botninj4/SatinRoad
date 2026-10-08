@@ -22,7 +22,7 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher<User> password
         user.PasswordHash = passwordHasher.HashPassword(user, dto.Password);
         db.Insert(user);
 
-        return new UserResponseDto(user.Id, user.Username);
+        return new UserResponseDto(user.Id, user.Username, user.IsShutDown);
     }
 
     public UserResponseDto? Login(LoginRequestDto dto)
@@ -40,13 +40,13 @@ public class UserService(MyDatabaseConnection db, IPasswordHasher<User> password
             db.Update(user);
         }
 
-        return new UserResponseDto(user.Id, user.Username);
+        return new UserResponseDto(user.Id, user.Username, user.IsShutDown);
     }
     public UserResponseDto? GetById(string id)
     {
         return db.Users
             .Where(user => user.Id == id)
-            .Select(user => new UserResponseDto(user.Id, user.Username))
+            .Select(user => new UserResponseDto(user.Id, user.Username, user.IsShutDown))
             .FirstOrDefault();
     }
 
