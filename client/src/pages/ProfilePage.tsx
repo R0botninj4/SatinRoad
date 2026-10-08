@@ -16,6 +16,8 @@ export function ProfilePage() {
     const [deleteError, setDeleteError] = useState("");
 
     useEffect(() => {
+        if (authLoading || !user || user.isShutDown) return;
+
         async function loadData() {
             try {
                 const [loadedItems, allListings, myOrders] = await Promise.all([
@@ -35,7 +37,7 @@ export function ProfilePage() {
         }
 
         loadData();
-    }, []);
+    }, [authLoading, user?.id, user?.isShutDown]);
 
     // Not logged in: send to the login page.
     if (!authLoading && !user) return <Navigate to="/login" replace />;
@@ -76,14 +78,23 @@ export function ProfilePage() {
 
             <h1 className="profile-name">{user.username}</h1>
 
-            {loading && <p>Loading profile...</p>}
-            {error && <p>{error}</p>}
+            {user.isShutDown ? (
+                <div className="profile-busted" role="status">
+                    <h2>Disconnected</h2>
+                    <p>The FBI has permanently shut down your shop.</p>
+                    <p>All your listings have been removed. You can still buy, but you cannot sell again.</p>
+                </div>
+            ) : (
+                <>
+                    {loading && <p>Loading profile...</p>}
+                    {error && <p>{error}</p>}
+                </>
+            )}
 
-            {!loading && !error && (
+            {!user.isShutDown && !loading && !error && (
                 <div className="profile-lists">
                     <div className="profile-sign">
                         <h2 className="profile-sign-title">Your listings</h2>
-
                         {deleteError && <p>{deleteError}</p>}
 
                         {myListings.length === 0 ? (

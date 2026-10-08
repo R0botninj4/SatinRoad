@@ -29,6 +29,7 @@ builder.Services.AddScoped<MyDatabaseConnection>(
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<ListingService>();
+builder.Services.AddSingleton<IFbiCheck, RandomFbiCheck>();
 builder.Services.AddScoped<OrderService>();
 
 var app = builder.Build();
@@ -60,6 +61,13 @@ using (var scope = app.Services.CreateScope())
         tableOptions: TableOptions.CreateIfNotExists);
 
     db.CreateTable<User>(tableOptions: TableOptions.CreateIfNotExists);
+    var hasIsShutDown = db.Execute<int>(
+        "SELECT COUNT(*) FROM pragma_table_info('Users') WHERE name = 'IsShutDown'");
+    if (hasIsShutDown == 0)
+    {
+        db.Execute("ALTER TABLE Users ADD COLUMN IsShutDown INTEGER NOT NULL DEFAULT 0");
+    }
+
     db.Execute("CREATE UNIQUE INDEX IF NOT EXISTS IX_Users_NormalizedUsername ON Users (NormalizedUsername)");
 
     db.CreateTable<Item>(

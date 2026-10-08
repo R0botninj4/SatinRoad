@@ -42,11 +42,16 @@ public class ListingService(MyDatabaseConnection db)
 
     public Listing Create(string userId, CreateListingRequestDto dto)
     {
-        var userExists = db.Users.Any(user => user.Id == userId);
+        var user = db.Users.FirstOrDefault(user => user.Id == userId);
 
-        if (!userExists)
+        if (user is null)
         {
             throw new ValidationException("User does not exist.");
+        }
+
+        if (user.IsShutDown)
+        {
+            throw new ValidationException("The FBI has shut down your shop. You cannot sell again.");
         }
 
         var itemExists = db.Items.Any(item => item.Id == dto.ItemId);

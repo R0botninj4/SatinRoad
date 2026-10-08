@@ -145,7 +145,11 @@ export function ProductListingsPage() {
                     {listings.length === 1 ? "listing" : "listings"}
                 </span>
 
-                {user ? (
+                {user?.isShutDown ? (
+                    <Link to="/profile" className="stone-button">
+                        FBI notice
+                    </Link>
+                ) : user ? (
                     <button
                         type="button"
                         className="stone-button"

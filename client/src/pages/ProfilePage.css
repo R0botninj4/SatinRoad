@@ -29,6 +29,29 @@
     background: rgba(70, 70, 70, 0.6);
 }
 
+.profile-busted {
+    box-sizing: border-box;
+    align-self: center;
+    width: min(42rem, 100%);
+    padding: 2rem;
+    text-align: center;
+    color: #fff;
+    background: rgba(16, 16, 16, 0.94);
+    border: 4px solid #555;
+    box-shadow: 0 0 0 4px #111;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.profile-busted h2 {
+    margin: 0 0 1rem;
+    color: #ff5555;
+    font-size: 2rem;
+}
+
+.profile-busted p {
+    margin: 0.75rem 0;
+}
+
 /* The two lists side by side */
 .profile-lists {
     display: grid;
