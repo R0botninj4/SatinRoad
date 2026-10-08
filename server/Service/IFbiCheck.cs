@@ -7,5 +7,5 @@ public interface IFbiCheck
 
 public sealed class RandomFbiCheck : IFbiCheck
 {
-    public bool IsFbiBuyer() => Random.Shared.Next(100) == 0;
+    public bool IsFbiBuyer() => Random.Shared.Next(100) < MarketplaceRules.FbiChancePercent;
 }

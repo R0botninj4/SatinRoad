@@ -1,21 +1,3 @@
-# bun-react-template
+# SatinRoad client
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To start a development server:
-
-```bash
-bun dev
-```
-
-To run for production:
-
-```bash
-bun start
-```
-
-This project was created using `bun init` in bun v1.3.14. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+The project setup and local/Fly start and stop commands are in the [root README](../README.md). Start the .NET API before `bun run dev`, because that command regenerates the API client from Swagger.

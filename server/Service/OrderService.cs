@@ -25,14 +25,10 @@ public class OrderService(MyDatabaseConnection db, IFbiCheck fbiCheck)
             throw new ValidationException("Listing does not exist.");
         }
 
-        var seller = db.Users.FirstOrDefault(user => user.Id == listing.UserId);
-        if (seller is null || seller.IsShutDown)
-        {
-            throw new ValidationException("Vendor is no longer selling.");
-        }
+        var seller = GetActiveVendor(listing.UserId);
 
         var remainingStock = OrderHelpers.CalculateRemainingStock(listing.Quantity, dto.Quantity);
-        
+
         var previousOrders = db.Orders.Count(order =>
             order.BuyerId == buyerId && order.SellerId == listing.UserId);
 
@@ -67,16 +63,14 @@ public class OrderService(MyDatabaseConnection db, IFbiCheck fbiCheck)
 
         if (fbiCheck.IsFbiBuyer())
         {
-            seller.IsShutDown = true;
-            db.Update(seller);
-            db.Listings.Where(other => other.UserId == seller.Id).Delete();
+            ShutDownVendor(seller);
         }
 
         transaction.Commit();
 
         return order;
     }
-    
+
     public OrderQuoteResponseDto GetQuote(string buyerId, CreateOrderRequestDto dto)
     {
         var listing = db.Listings.FirstOrDefault(listing =>
@@ -87,10 +81,7 @@ public class OrderService(MyDatabaseConnection db, IFbiCheck fbiCheck)
             throw new ValidationException("Listing does not exist.");
         }
 
-        if (!db.Users.Any(user => user.Id == listing.UserId && !user.IsShutDown))
-        {
-            throw new ValidationException("Vendor is no longer selling.");
-        }
+        GetActiveVendor(listing.UserId);
 
         if (dto.Quantity < 1)
         {
@@ -116,6 +107,22 @@ public class OrderService(MyDatabaseConnection db, IFbiCheck fbiCheck)
             .OrderByDescending(order => order.CreatedAt)
             .ToList();
     }
-    
-    
+
+    private User GetActiveVendor(string sellerId)
+    {
+        var seller = db.Users.FirstOrDefault(user => user.Id == sellerId);
+        if (seller is null || seller.IsShutDown)
+        {
+            throw new ValidationException("Vendor is no longer selling.");
+        }
+
+        return seller;
+    }
+
+    private void ShutDownVendor(User seller)
+    {
+        seller.IsShutDown = true;
+        db.Update(seller);
+        db.Listings.Where(listing => listing.UserId == seller.Id).Delete();
+    }
 }
