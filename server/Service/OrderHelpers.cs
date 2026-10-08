@@ -13,7 +13,7 @@ public static class OrderHelpers
 
         if (HasLoyaltyDiscount(previousOrders))
         {
-            return decimal.Round(total * 0.80m, 2);
+            return decimal.Round(total * MarketplaceRules.LoyaltyDiscountMultiplier, 2);
         }
 
         return total;
@@ -31,6 +31,6 @@ public static class OrderHelpers
     
     public static bool HasLoyaltyDiscount(int previousOrders)
     {
-        return previousOrders % 11 == 10;
+        return (previousOrders + 1) % MarketplaceRules.LoyaltyDiscountInterval == 0;
     }
 }

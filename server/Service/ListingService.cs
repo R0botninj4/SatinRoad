@@ -8,32 +8,29 @@ public class ListingService(MyDatabaseConnection db)
 {
     public List<ListingResponseDto> GetAll()
     {
-        var listings = db.Listings
+        var usernames = db.Users
+            .Select(user => new { user.Id, user.Username })
+            .ToDictionary(user => user.Id, user => user.Username);
+
+        var salesCounts = db.Orders
+            .GroupBy(order => order.SellerId)
+            .Select(group => new { SellerId = group.Key, Count = group.Count() })
+            .ToDictionary(group => group.SellerId, group => group.Count);
+
+        return db.Listings
             .OrderBy(listing => listing.Id)
-            .ToList();
-
-        return listings
-            .Select(listing =>
+            .ToList()
+            .Select(listing => new ListingResponseDto
             {
-                var username = db.Users
-                    .Where(user => user.Id == listing.UserId)
-                    .Select(user => user.Username)
-                    .FirstOrDefault();
-
-                var numberOfSales = db.Orders.Count(order =>
-                    order.SellerId == listing.UserId);
-
-                return new ListingResponseDto
-                {
-                    Id = listing.Id,
-                    UserId = listing.UserId,
-                    Username = username ?? "Unknown vendor",
-                    ItemId = listing.ItemId,
-                    Price = listing.Price,
-                    Quantity = listing.Quantity,
-                    Description = listing.Description,
-                    IsFeatured = numberOfSales > 100
-                };
+                Id = listing.Id,
+                UserId = listing.UserId,
+                Username = usernames.GetValueOrDefault(listing.UserId) ?? "Unknown vendor",
+                ItemId = listing.ItemId,
+                Price = listing.Price,
+                Quantity = listing.Quantity,
+                Description = listing.Description,
+                IsFeatured = salesCounts.GetValueOrDefault(listing.UserId)
+                    > MarketplaceRules.FeaturedVendorSalesThreshold
             })
             .OrderByDescending(listing => listing.IsFeatured)
             .ThenBy(listing => listing.Price)
